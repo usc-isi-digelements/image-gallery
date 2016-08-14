@@ -1,0 +1,158 @@
+<link rel="import" href="../polymer/polymer.html">
+<link rel="import" href="../image-gallery-popup/image-gallery-popup.html">
+<link rel="import" href="../image-thumbnail-with-link/image-thumbnail-with-link.html">
+<link rel="import" href="../iron-flex-layout/iron-flex-layout-classes.html">
+
+<!--
+A polymer web component that shows a gallery of image thumbnails that each show an image popup when clicked or tapped.
+
+Example:
+
+        <image-gallery
+          images="[[array]]">
+        </image-gallery>
+
+@demo demo/index.html
+-->
+
+<dom-module id="image-gallery">
+  <template>
+    <style include="iron-flex iron-flex-alignment"></style>
+
+    <style>
+      :host {
+        display: block;
+      }
+    </style>
+
+    <div class="layout horizontal flex wrap" on-tap="stopClickPropagation">
+      <template is="dom-repeat" items="[[images]]">
+        <image-thumbnail-with-link
+          link="[[getProperty(item, imageLinkProperty)]]"
+          source="[[getProperty(item, imageSourceProperty)]]"
+          style-class="[[getBlurStyleClass(blur)]]"
+          target="[[getTarget(newTab)]]"
+          text="open image"
+          click-listener="[[createImageClickListener()]]"
+          click-value="[[index]]">
+        </image-thumbnail-with-link>
+      </template>
+    </div>
+  </template>
+
+  <script>
+  (function() {
+    'use strict';
+
+    Polymer({
+      is: 'image-gallery',
+
+      properties: {
+        /**
+         * The array of image objects.
+         */
+        images: {
+          type: Array,
+          value: function() {
+            return [];
+          },
+          notify: true
+        },
+
+        /**
+         * The property of the image objects for their link URL to open information within the application.
+         */
+        imageLinkProperty: {
+          type: String,
+          value: 'link'
+        },
+
+        /**
+         * The property of the image objects for their source URL.
+         */
+        imageSourceProperty: {
+          type: String,
+          value: 'source'
+        },
+
+        /**
+         * Whether to blur the images.
+         */
+        blur: {
+          type: Boolean,
+          value: true
+        },
+
+        /**
+         * Whether to open a link in a new tab.
+         */
+        newTab: {
+          type: Boolean,
+          value: false
+        }
+      },
+
+      /**
+       * Returns the style class for blur.
+       */
+      getBlurStyleClass: function(blur) {
+        return (blur ? 'small-blur' : '');
+      },
+
+      /**
+       * Returns the given property in the given item.
+       */
+      getProperty: function(item, property, defaultValue) {
+        return item[property] || defaultValue;
+      },
+
+      /**
+       * Returns the target for links.
+       */
+      getTarget: function(newTab) {
+        return (newTab ? '_blank' : '_self');
+      },
+
+      /**
+       * Stops propagation of the given click event on the container element.
+       */
+      stopClickPropagation: function(event) {
+        event.stopImmediatePropagation();
+      },
+
+      /**
+       * Creates and returns a click listener for the image thumbnails that opens the image in an image-gallery-popup.
+       */
+      createImageClickListener: function() {
+        var self = this;
+
+        var createPopupElement = function(index) {
+          /* Appending image-gallery-popup element with paper-dialog to body when
+             opened -- workaround for unexpected behavior with overlays, which should
+             be placed directly in the body tag whenever possible:
+             https://github.com/PolymerElements/polymer-starter-kit/issues/154
+             https://github.com/PolymerElements/paper-dialog/issues/79#issuecomment-201681529
+          */
+          var body = Polymer.dom(document).querySelector('body');
+          var firstChildOfBody = Polymer.dom(body).firstChild;
+          var imageGalleryPopupElement = document.createElement('image-gallery-popup');
+
+          imageGalleryPopupElement.images = self.images;
+          imageGalleryPopupElement.imageLinkProperty = self.imageLinkProperty;
+          imageGalleryPopupElement.imageSourceProperty = self.imageSourceProperty;
+          imageGalleryPopupElement.currentIndex = index;
+          imageGalleryPopupElement.linkText = 'open image';
+          imageGalleryPopupElement.linkTarget = self.getTarget(self.newTab);
+          imageGalleryPopupElement.styleClass = (self.blur ? 'large-blur' : '');
+
+          body.insertBefore(imageGalleryPopupElement, firstChildOfBody);
+        };
+
+        return {
+          onClick: createPopupElement
+        };
+      }
+    });
+  })();
+  </script>
+</dom-module>
