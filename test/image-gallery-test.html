@@ -54,6 +54,12 @@
         expect(component.newTab).to.equal(false);
       });
 
+      test('top level div has correct onTap function specified', function() {
+        var someEvent = document.createEvent('UIEvent');
+        expect(component.$$('div')).to.exist;
+        expect(component.$$('div').onTap).to.equal(component.stopClickPropagation(someEvent));
+      });
+
       test('getBlurStyleClass returns the correct value', function() {
         expect(component.getBlurStyleClass(true)).to.equal('small-blur');
         expect(component.getBlurStyleClass(false)).to.equal('');
@@ -62,6 +68,11 @@
       test('getProperty returns the correct id and source', function() {
         expect(component.getProperty(component.images[0], component.imageLinkProperty)).to.be.equal('link1');
         expect(component.getProperty(component.images[0], component.imageSourceProperty)).to.be.equal('source1');
+      });
+
+      test('getProperty returns defaultValue argument if item property does not exist', function() {
+        expect(component.getProperty(component.images[0], 'invalidkey1', 'defaultValue')).to.be.equal('defaultValue');
+        expect(component.getProperty(component.images[0], 'invalidkey2', 'anotherDefault')).to.be.equal('anotherDefault');
       });
 
       test('getTarget returns the correct value', function() {
