@@ -1,12 +1,10 @@
 # image-gallery
 
-A polymer web component that shows a gallery of image thumbnails that each show an image popup when clicked or tapped.
+A Polymer Element showing a gallery of image thumbnails that each open an image-gallery-popup when clicked or tapped.
 
-Example:
+### Example
 ```html
-        <image-gallery
-          images="[[array]]">
-        </image-gallery>
+    <image-gallery images="[[array]]"></image-gallery>
 ```
 
 ### Dependencies

@@ -16,11 +16,11 @@
 
   <script>
     suite('image-gallery tests', function() {
-      var component;
+      var element;
 
       setup(function(done) {
-        component = fixture('image-gallery-fixture');
-        component.images = [{
+        element = fixture('image-gallery-fixture');
+        element.images = [{
           id: 'id1',
           link: 'link1',
           source: 'source1'
@@ -35,8 +35,8 @@
       });
 
       test('images is an array', function() {
-        expect(component.images).to.be.an('Array');
-        expect(component.images).to.deep.equal([{
+        expect(element.images).to.be.an('Array');
+        expect(element.images).to.deep.equal([{
           id: 'id1',
           link: 'link1',
           source: 'source1'
@@ -48,40 +48,40 @@
       });
 
       test('blur, imageLinkProperty, imageSourceProperty, and newTab are set to default values', function() {
-        expect(component.blur).to.equal(true);
-        expect(component.imageLinkProperty).to.equal('link');
-        expect(component.imageSourceProperty).to.equal('source');
-        expect(component.newTab).to.equal(false);
+        expect(element.blur).to.equal(false);
+        expect(element.imageLinkProperty).to.equal('link');
+        expect(element.imageSourceProperty).to.equal('source');
+        expect(element.newTab).to.equal(false);
       });
 
       test('top level div has correct onTap function specified', function() {
         var someEvent = document.createEvent('UIEvent');
-        expect(component.$$('div')).to.exist;
-        expect(component.$$('div').onTap).to.equal(component.stopClickPropagation(someEvent));
+        expect(element.$$('div')).to.exist;
+        expect(element.$$('div').onTap).to.equal(element._stopClickPropagation(someEvent));
       });
 
-      test('getBlurStyleClass returns the correct value', function() {
-        expect(component.getBlurStyleClass(true)).to.equal('small-blur');
-        expect(component.getBlurStyleClass(false)).to.equal('');
+      test('_getBlurStyleClass returns the correct value', function() {
+        expect(element._getBlurStyleClass(true)).to.equal('small-blur');
+        expect(element._getBlurStyleClass(false)).to.equal('');
       });
 
-      test('getProperty returns the correct id and source', function() {
-        expect(component.getProperty(component.images[0], component.imageLinkProperty)).to.be.equal('link1');
-        expect(component.getProperty(component.images[0], component.imageSourceProperty)).to.be.equal('source1');
+      test('_getProperty returns the correct id and source', function() {
+        expect(element._getProperty(element.images[0], element.imageLinkProperty)).to.be.equal('link1');
+        expect(element._getProperty(element.images[0], element.imageSourceProperty)).to.be.equal('source1');
       });
 
-      test('getProperty returns defaultValue argument if item property does not exist', function() {
-        expect(component.getProperty(component.images[0], 'invalidkey1', 'defaultValue')).to.be.equal('defaultValue');
-        expect(component.getProperty(component.images[0], 'invalidkey2', 'anotherDefault')).to.be.equal('anotherDefault');
+      test('_getProperty returns defaultValue argument if item property does not exist', function() {
+        expect(element._getProperty(element.images[0], 'invalidkey1', 'defaultValue')).to.be.equal('defaultValue');
+        expect(element._getProperty(element.images[0], 'invalidkey2', 'anotherDefault')).to.be.equal('anotherDefault');
       });
 
-      test('getTarget returns the correct value', function() {
-        expect(component.getTarget(true)).to.be.equal('_blank');
-        expect(component.getTarget(false)).to.be.equal('_self');
+      test('_getTarget returns the correct value', function() {
+        expect(element._getTarget(true)).to.be.equal('_blank');
+        expect(element._getTarget(false)).to.be.equal('_self');
       });
 
-      test('createImageClickListener returns an object with the correct properties', function() {
-        var output = component.createImageClickListener();
+      test('_createImageClickListener returns an object with the correct properties', function() {
+        var output = element._createImageClickListener();
         expect(output).to.exist;
         expect(output).to.be.an('Object');
         expect(output.onClick).to.exist;
@@ -89,12 +89,12 @@
       });
 
       test('onClick creates an image-gallery-popup element with the correct values', function() {
-        var output = component.createImageClickListener();
+        var output = element._createImageClickListener();
         output.onClick(1);
 
         var imageGalleryPopupElement = document.querySelector('image-gallery-popup');
         expect(imageGalleryPopupElement).to.exist;
-        expect(imageGalleryPopupElement.images).to.deep.equal(component.images);
+        expect(imageGalleryPopupElement.images).to.deep.equal(element.images);
         expect(imageGalleryPopupElement.currentIndex).to.equal(1);
         expect(imageGalleryPopupElement.currentImage).to.deep.equal({
           id: 'id2',
@@ -104,7 +104,7 @@
       });
 
       test('does have image-thumbnail-with-link elements', function() {
-        var image = component.$$('image-thumbnail-with-link');
+        var image = element.$$('image-thumbnail-with-link');
         expect(image).to.exist;
         expect(image.link).to.equal('link1');
         expect(image.source).to.equal('source1');

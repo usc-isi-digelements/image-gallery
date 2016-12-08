@@ -4,13 +4,11 @@
 <link rel="import" href="../iron-flex-layout/iron-flex-layout-classes.html">
 
 <!--
-A polymer web component that shows a gallery of image thumbnails that each show an image popup when clicked or tapped.
+A Polymer Element showing a gallery of image thumbnails that each open an image-gallery-popup when clicked or tapped.
 
-Example:
+### Example
 
-        <image-gallery
-          images="[[array]]">
-        </image-gallery>
+    <image-gallery images="[[array]]"></image-gallery>
 
 @demo demo/index.html
 -->
@@ -25,15 +23,15 @@ Example:
       }
     </style>
 
-    <div class="layout horizontal flex wrap" on-tap="stopClickPropagation">
+    <div class="layout horizontal flex wrap" on-tap="_stopClickPropagation">
       <template is="dom-repeat" items="[[images]]">
         <image-thumbnail-with-link
-          link="[[getProperty(item, imageLinkProperty)]]"
-          source="[[getProperty(item, imageSourceProperty)]]"
-          style-class="[[getBlurStyleClass(blur)]]"
-          target="[[getTarget(newTab)]]"
+          link="[[_getProperty(item, imageLinkProperty)]]"
+          source="[[_getProperty(item, imageSourceProperty)]]"
+          style-class="[[_getBlurStyleClass(blur)]]"
+          target="[[_getTarget(newTab)]]"
           text="open image"
-          click-listener="[[createImageClickListener()]]"
+          click-listener="[[_createImageClickListener()]]"
           click-value="[[index]]">
         </image-thumbnail-with-link>
       </template>
@@ -50,6 +48,9 @@ Example:
       properties: {
         /**
          * The array of image objects.
+         *
+         * @type {Array}
+         * @default []
          */
         images: {
           type: Array,
@@ -61,6 +62,9 @@ Example:
 
         /**
          * The property of the image objects for their link URL to open information within the application.
+         *
+         * @type {String}
+         * @default 'link'
          */
         imageLinkProperty: {
           type: String,
@@ -69,6 +73,9 @@ Example:
 
         /**
          * The property of the image objects for their source URL.
+         *
+         * @type {String}
+         * @default 'source'
          */
         imageSourceProperty: {
           type: String,
@@ -77,14 +84,20 @@ Example:
 
         /**
          * Whether to blur the images.
+         *
+         * @type {Boolean}
+         * @default false
          */
         blur: {
           type: Boolean,
-          value: true
+          value: false
         },
 
         /**
          * Whether to open a link in a new tab.
+         *
+         * @type {Boolean}
+         * @default false
          */
         newTab: {
           type: Boolean,
@@ -94,36 +107,56 @@ Example:
 
       /**
        * Returns the style class for blur.
+       *
+       * @param {Boolean} blur
+       * @return {String}
+       * @private
        */
-      getBlurStyleClass: function(blur) {
+      _getBlurStyleClass: function(blur) {
         return (blur ? 'small-blur' : '');
       },
 
       /**
-       * Returns the given property in the given item.
+       * Returns the given property in the given item or the given default value if the property is empty.
+       *
+       * @param {Object} item
+       * @param {String} property
+       * @param defaultValue
+       * @return
+       * @private
        */
-      getProperty: function(item, property, defaultValue) {
+      _getProperty: function(item, property, defaultValue) {
         return item[property] || defaultValue;
       },
 
       /**
        * Returns the target for links.
+       *
+       * @param {Boolean} newTab
+       * @return {String}
+       * @private
        */
-      getTarget: function(newTab) {
+      _getTarget: function(newTab) {
         return (newTab ? '_blank' : '_self');
       },
 
       /**
        * Stops propagation of the given click event on the container element.
+       *
+       * @event tap
+       * @private
        */
-      stopClickPropagation: function(event) {
+      _stopClickPropagation: function(event) {
         event.stopImmediatePropagation();
       },
 
       /**
        * Creates and returns a click listener for the image thumbnails that opens the image in an image-gallery-popup.
+       *
+       * @return {Object}
+       * @private
        */
-      createImageClickListener: function() {
+      _createImageClickListener: function() {
         var self = this;
 
         var createPopupElement = function(index) {
@@ -142,7 +175,7 @@ Example:
           imageGalleryPopupElement.imageSourceProperty = self.imageSourceProperty;
           imageGalleryPopupElement.currentIndex = index;
           imageGalleryPopupElement.linkText = 'open image';
-          imageGalleryPopupElement.linkTarget = self.getTarget(self.newTab);
+          imageGalleryPopupElement.linkTarget = self._getTarget(self.newTab);
           imageGalleryPopupElement.styleClass = (self.blur ? 'large-blur' : '');
 
           body.insertBefore(imageGalleryPopupElement, firstChildOfBody);
