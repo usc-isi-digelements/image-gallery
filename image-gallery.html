@@ -7,8 +7,9 @@
 A Polymer Element showing a gallery of image thumbnails that each open an image-gallery-popup when clicked or tapped.
 
 ### Example
-
-    <image-gallery images="[[array]]"></image-gallery>
+```html
+<image-gallery images="[[array]]"></image-gallery>
+```
 
 @demo demo/index.html
 -->
@@ -47,6 +48,8 @@ A Polymer Element showing a gallery of image thumbnails that each open an image-
 
       properties: {
         /**
+         * (Required)
+         *
          * The array of image objects.
          *
          * @type {Array}
@@ -61,6 +64,8 @@ A Polymer Element showing a gallery of image thumbnails that each open an image-
         },
 
         /**
+         * (Optional)
+         *
          * The property of the image objects for their link URL to open information within the application.
          *
          * @type {String}
@@ -72,6 +77,8 @@ A Polymer Element showing a gallery of image thumbnails that each open an image-
         },
 
         /**
+         * (Optional)
+         *
          * The property of the image objects for their source URL.
          *
          * @type {String}
@@ -83,6 +90,8 @@ A Polymer Element showing a gallery of image thumbnails that each open an image-
         },
 
         /**
+         * (Optional)
+         *
          * Whether to blur the images.
          *
          * @type {Boolean}
@@ -94,6 +103,8 @@ A Polymer Element showing a gallery of image thumbnails that each open an image-
         },
 
         /**
+         * (Optional)
+         *
          * Whether to open a link in a new tab.
          *
          * @type {Boolean}
