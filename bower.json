@@ -1,10 +1,9 @@
 {
   "name": "image-gallery",
-  "version": "1.0.1",
-  "authors": [
-    "Next Century Corporation"
-  ],
   "description": "A Polymer Element showing a gallery of image thumbnails that each open an image-gallery-popup when clicked or tapped.",
+  "version": "1.0.1",
+  "authors": ["Next Century Corporation"],
+  "license": "Apache-2.0",
   "keywords": [
     "web-component",
     "polymer"
