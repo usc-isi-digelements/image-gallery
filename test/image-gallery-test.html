@@ -45,9 +45,7 @@ limitations under the License.
           link: 'link2',
           source: 'source2'
         }];
-        flush(function() {
-          done();
-        });
+        flush(done);
       });
 
       test('images is an array', function() {
@@ -76,9 +74,39 @@ limitations under the License.
         expect(element.$$('div').onTap).to.equal(element._stopClickPropagation(someEvent));
       });
 
+      test('_addStyleClass returns the correct value', function() {
+        expect(element._addStyleClass([], {}, 'id', 'styleClass1')).to.equal('');
+        expect(element._addStyleClass([], {
+          id: 'id1'
+        }, 'id', 'styleClass1')).to.equal('');
+        expect(element._addStyleClass(['id1'], {
+          id: 'id1'
+        }, 'id', 'styleClass1')).to.equal('styleClass1');
+        expect(element._addStyleClass(['id2'], {
+          id: 'id1'
+        }, 'id', 'styleClass1')).to.equal('');
+        expect(element._addStyleClass(['id1'], {
+          name: 'id1'
+        }, 'id', 'styleClass1')).to.equal('');
+        expect(element._addStyleClass(['id1'], {
+          id: 'id2'
+        }, 'id', 'styleClass1')).to.equal('');
+        expect(element._addStyleClass(['id1'], {
+          id: 'id1'
+        }, 'name', 'styleClass1')).to.equal('');
+        expect(element._addStyleClass(['id1'], {
+          id: 'id1'
+        }, 'id', 'styleClass2')).to.equal('styleClass2');
+      });
+
       test('_getBlurStyleClass returns the correct value', function() {
         expect(element._getBlurStyleClass(true)).to.equal('small-blur');
         expect(element._getBlurStyleClass(false)).to.equal('');
+      });
+
+      test('_getImageTitle returns the correct value', function() {
+        expect(element._getImageTitle(0)).to.equal('Click to View Full-Size Image #1');
+        expect(element._getImageTitle(1)).to.equal('Click to View Full-Size Image #2');
       });
 
       test('_getProperty returns the correct id and source', function() {
@@ -122,8 +150,131 @@ limitations under the License.
       test('does have image-thumbnail-with-link elements', function() {
         var image = element.$$('image-thumbnail-with-link');
         expect(image).to.exist;
+        expect(image.id).to.equal('id1');
         expect(image.link).to.equal('link1');
         expect(image.source).to.equal('source1');
+        expect(image.title).to.exist;
+        expect(image.classList.contains('hovering')).to.be.false;
+        expect(image.classList.contains('selected')).to.be.false;
+      });
+
+      test('adding image ID to hovering list does add hovering style class to image element', function(done) {
+        element.hovering = ['id1'];
+
+        flush(function() {
+          expect(element.hovering).to.deep.equal(['id1']);
+          var image = element.$$('image-thumbnail-with-link');
+          expect(image).to.exist;
+          expect(image.classList.contains('hovering')).to.be.true;
+          expect(image.classList.contains('selected')).to.be.false;
+          done();
+        });
+      });
+
+      test('adding image ID to selected list does add selected style class to image element', function(done) {
+        element.selected = ['id1'];
+
+        flush(function() {
+          expect(element.selected).to.deep.equal(['id1']);
+          var image = element.$$('image-thumbnail-with-link');
+          expect(image).to.exist;
+          expect(image.classList.contains('hovering')).to.be.false;
+          expect(image.classList.contains('selected')).to.be.true;
+          done();
+        });
+      });
+
+      test('adding image ID to both hovering and selected list does add both hovering and selected style class to image element', function(done) {
+        element.hovering = ['id1'];
+        element.selected = ['id1'];
+
+        flush(function() {
+          expect(element.hovering).to.deep.equal(['id1']);
+          expect(element.selected).to.deep.equal(['id1']);
+          var image = element.$$('image-thumbnail-with-link');
+          expect(image).to.exist;
+          expect(image.classList.contains('hovering')).to.be.true;
+          expect(image.classList.contains('selected')).to.be.true;
+          done();
+        });
+      });
+
+      test('adding other image ID to hovering or selected list does not add hovering or selected style class to image element', function(done) {
+        element.hovering = ['otherId'];
+        element.selected = ['otherId'];
+
+        flush(function() {
+          expect(element.hovering).to.deep.equal(['otherId']);
+          expect(element.selected).to.deep.equal(['otherId']);
+          var image = element.$$('image-thumbnail-with-link');
+          expect(image).to.exist;
+          expect(image.classList.contains('hovering')).to.be.false;
+          expect(image.classList.contains('selected')).to.be.false;
+          done();
+        });
+      });
+    });
+
+    suite('image-gallery tests without links', function() {
+      var element;
+
+      setup(function(done) {
+        element = fixture('image-gallery-fixture');
+        element.images = [{
+          id: 'id1',
+          source: 'source1'
+        }, {
+          id: 'id2',
+          source: 'source2'
+        }];
+        flush(done);
+      });
+
+      test('images is an array', function() {
+        expect(element.images).to.be.an('Array');
+        expect(element.images).to.deep.equal([{
+          id: 'id1',
+          source: 'source1'
+        }, {
+          id: 'id2',
+          source: 'source2'
+        }]);
+      });
+
+      test('does have image-thumbnail elements', function() {
+        var image = element.$$('image-thumbnail');
+        expect(image).to.exist;
+        expect(image.id).to.equal('id1');
+        expect(image.source).to.equal('source1');
+        expect(image.title).to.exist;
+        expect(image.classList.contains('hovering')).to.be.false;
+        expect(image.classList.contains('selected')).to.be.false;
+      });
+
+      test('adding image ID to hovering list does add hovering style class to image element', function(done) {
+        element.hovering = ['id1'];
+
+        flush(function() {
+          expect(element.hovering).to.deep.equal(['id1']);
+          var image = element.$$('image-thumbnail');
+          expect(image).to.exist;
+          expect(image.classList.contains('hovering')).to.be.true;
+          expect(image.classList.contains('selected')).to.be.false;
+          done();
+        });
+      });
+
+      test('adding image ID to selected list does add selected style class to image element', function(done) {
+        element.selected = ['id1'];
+
+        flush(function() {
+          expect(element.selected).to.deep.equal(['id1']);
+          var image = element.$$('image-thumbnail');
+          expect(image).to.exist;
+          expect(image.classList.contains('hovering')).to.be.false;
+          expect(image.classList.contains('selected')).to.be.true;
+          done();
+        });
       });
     });
   </script>

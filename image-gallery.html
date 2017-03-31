@@ -27,6 +27,15 @@ A Polymer Element showing a gallery of image thumbnails that each open an image-
 <image-gallery images="[[array]]"></image-gallery>
 ```
 
+### Styling
+
+`<image-gallery>` provides the following custom properties and mixins for styling:
+
+Custom property          | Description                                  | Default
+-------------------------|----------------------------------------------|--------
+`--image-hovering-color` | The background color of the hovering images. | none
+`--image-selected-color` | The background color of the selected images. | none
+
 @demo demo/index.html
 -->
 
@@ -38,19 +47,61 @@ A Polymer Element showing a gallery of image thumbnails that each open an image-
       :host {
         display: block;
       }
+
+      image-thumbnail {
+        height: 120px;
+      }
+
+      image-thumbnail ::content paper-button {
+        margin: 5px;
+        padding: 5px;
+      }
+
+      image-thumbnail.selected ::content .highlight,
+      image-thumbnail-with-link.selected ::content .highlight {
+        background-color: var(--image-selected-color);
+      }
+
+      image-thumbnail.hovering ::content .highlight,
+      image-thumbnail-with-link.hovering ::content .highlight {
+        background-color: var(--image-hovering-color);
+      }
     </style>
 
     <div class="layout horizontal flex wrap" on-tap="_stopClickPropagation">
-      <template is="dom-repeat" items="[[images]]">
-        <image-thumbnail-with-link
-          link="[[_getProperty(item, imageLinkProperty)]]"
-          source="[[_getProperty(item, imageSourceProperty)]]"
-          style-class="[[_getBlurStyleClass(blur)]]"
-          target="[[_getTarget(newTab)]]"
-          text="open image"
-          click-listener="[[_createImageClickListener()]]"
-          click-value="[[index]]">
-        </image-thumbnail-with-link>
+      <template is="dom-repeat" items="[[images]]" as="image">
+        <template is="dom-if" if="[[_getProperty(image, imageLinkProperty)]]">
+          <image-thumbnail-with-link
+            id="[[_getProperty(image, imageIdProperty)]]"
+            class$="[[_addStyleClass(selected, image, imageIdProperty, 'selected')]] [[_addStyleClass(hovering, image, imageIdProperty, 'hovering')]]"
+            title$="[[_getImageTitle(index)]]"
+            on-mouseover="_hoverStart"
+            on-mouseout="_hoverEnd"
+            highlight
+            link="[[_getProperty(image, imageLinkProperty)]]"
+            source="[[_getProperty(image, imageSourceProperty)]]"
+            style-class="[[_getBlurStyleClass(blur)]]"
+            target="[[_getTarget(newTab)]]"
+            text="open image"
+            click-listener="[[_createImageClickListener()]]"
+            click-value="[[index]]">
+          </image-thumbnail-with-link>
+        </template>
+
+        <template is="dom-if" if="[[!_getProperty(image, imageLinkProperty)]]">
+          <image-thumbnail
+            id="[[_getProperty(image, imageIdProperty)]]"
+            class$="[[_addStyleClass(selected, image, imageIdProperty, 'selected')]] [[_addStyleClass(hovering, image, imageIdProperty, 'hovering')]]"
+            title$="[[_getImageTitle(index)]]"
+            on-mouseover="_hoverStart"
+            on-mouseout="_hoverEnd"
+            highlight
+            source="[[_getProperty(image, imageSourceProperty)]]"
+            style-class="[[_getBlurStyleClass(blur)]]"
+            click-listener="[[_createImageClickListener()]]"
+            click-value="[[index]]">
+          </image-thumbnail-with-link>
+        </template>
       </template>
     </div>
   </template>
@@ -75,8 +126,20 @@ A Polymer Element showing a gallery of image thumbnails that each open an image-
           type: Array,
           value: function() {
             return [];
-          },
-          notify: true
+          }
+        },
+
+        /**
+         * (Optional)
+         *
+         * The property of the image objects for their unique IDs.
+         *
+         * @type {String}
+         * @default 'id'
+         */
+        imageIdProperty: {
+          type: String,
+          value: 'id'
         },
 
         /**
@@ -121,6 +184,22 @@ A Polymer Element showing a gallery of image thumbnails that each open an image-
         /**
          * (Optional)
          *
+         * The list of image IDs targeted by a hover event.
+         *
+         * @type {Array}
+         * @default []
+         */
+        hovering: {
+          notify: true,
+          type: Array,
+          value: function() {
+            return [];
+          }
+        },
+
+        /**
+         * (Optional)
+         *
          * Whether to open a link in a new tab.
          *
          * @type {Boolean}
@@ -129,7 +208,35 @@ A Polymer Element showing a gallery of image thumbnails that each open an image-
         newTab: {
           type: Boolean,
           value: false
+        },
+
+        /**
+         * (Optional)
+         *
+         * The list of selected image IDs.
+         *
+         * @type {Array}
+         * @default []
+         */
+        selected: {
+          type: Array,
+          value: function() {
+            return [];
+          }
         }
+      },
+
+      /**
+       * Returns whether the value in the given item at the given property is in the given list.
+       *
+       * @param {Array} list
+       * @param {Object} item
+       * @param {String} property
+       * @return {Boolean}
+       * @private
+       */
+      _addStyleClass: function(list, item, property, styleClass) {
+        return item && typeof item[property] !== 'undefined' && list.indexOf(item[property]) >= 0 ? styleClass : '';
       },
 
       /**
@@ -141,6 +248,17 @@ A Polymer Element showing a gallery of image thumbnails that each open an image-
        */
       _getBlurStyleClass: function(blur) {
         return (blur ? 'small-blur' : '');
+      },
+
+      /**
+       * Returns the title for the image at the given index.
+       *
+       * @param {Number} index
+       * @return {String}
+       * @private
+       */
+      _getImageTitle: function(index) {
+        return 'Click to View Full-Size Image #' + (index + 1);
       },
 
       /**
@@ -165,6 +283,26 @@ A Polymer Element showing a gallery of image thumbnails that each open an image-
        */
       _getTarget: function(newTab) {
         return (newTab ? '_blank' : '_self');
+      },
+
+      /**
+       * Resets the hovering array.
+       *
+       * @event mouseout
+       * @private
+       */
+      _hoverEnd: function() {
+        this.set('hovering', []);
+      },
+
+      /**
+       * Sets the hovering array to the ID of the image in the given event model.
+       *
+       * @event mouseover
+       * @private
+       */
+      _hoverStart: function(event) {
+        this.set('hovering', [event.model.image[this.imageIdProperty]]);
       },
 
       /**

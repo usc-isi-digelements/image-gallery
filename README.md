@@ -7,6 +7,15 @@ A Polymer Element showing a gallery of image thumbnails that each open an image-
 <image-gallery images="[[array]]"></image-gallery>
 ```
 
+### Styling
+
+`<image-gallery>` provides the following custom properties and mixins for styling:
+
+Custom property          | Description                                  | Default
+-------------------------|----------------------------------------------|--------
+`--image-hovering-color` | The background color of the hovering images. | none
+`--image-selected-color` | The background color of the selected images. | none
+
 ### Dependencies
 
 Dependencies are installed using [Bower](http://bower.io/):
