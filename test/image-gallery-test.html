@@ -213,6 +213,39 @@ limitations under the License.
           done();
         });
       });
+
+      test('_hoverStart does set the hovering array', function() {
+        element._hoverStart({
+          model: {
+            image: {
+              id: 'id1',
+              link: 'link1',
+              source: 'source1'
+            }
+          }
+        });
+
+        expect(element.hovering).to.deep.equal(['id1']);
+      });
+
+      test('_hoverEnd does unset the hovering array', function() {
+        element.hovering = ['id1'];
+        element._hoverEnd();
+        expect(element.hovering).to.deep.equal([]);
+      });
+
+      test('moving over an image does set the hovering array', function() {
+        var image = element.$$('image-thumbnail-with-link');
+        image.dispatchEvent(new Event('mouseover'));
+        expect(element.hovering).to.deep.equal(['id1']);
+      });
+
+      test('moving out of an image does unset the hovering array', function() {
+        element.hovering = ['id1'];
+        var image = element.$$('image-thumbnail-with-link');
+        image.dispatchEvent(new Event('mouseout'));
+        expect(element.hovering).to.deep.equal([]);
+      });
     });
 
     suite('image-gallery tests without links', function() {
@@ -275,6 +308,19 @@ limitations under the License.
           expect(image.classList.contains('selected')).to.be.true;
           done();
         });
+      });
+
+      test('moving over an image does set the hovering array', function() {
+        var image = element.$$('image-thumbnail');
+        image.dispatchEvent(new Event('mouseover'));
+        expect(element.hovering).to.deep.equal(['id1']);
+      });
+
+      test('moving out of an image does unset the hovering array', function() {
+        element.hovering = ['id1'];
+        var image = element.$$('image-thumbnail');
+        image.dispatchEvent(new Event('mouseout'));
+        expect(element.hovering).to.deep.equal([]);
       });
     });
   </script>
