@@ -77,11 +77,12 @@ Custom property          | Description                                  | Defaul
             on-mouseover="_hoverStart"
             on-mouseout="_hoverEnd"
             highlight
+            icon="[[_getIcon(newTab)]]"
             link="[[_getProperty(image, imageLinkProperty)]]"
             source="[[_getProperty(image, imageSourceProperty)]]"
             style-class="[[_getBlurStyleClass(blur)]]"
             target="[[_getTarget(newTab)]]"
-            text="open image"
+            text="open"
             click-listener="[[_createImageClickListener()]]"
             click-title="[[_getImageTitle(index)]]"
             click-value="[[index]]">
@@ -248,6 +249,17 @@ Custom property          | Description                                  | Defaul
        */
       _getBlurStyleClass: function(blur) {
         return (blur ? 'small-blur' : '');
+      },
+
+      /**
+       * Returns the icon for links.
+       *
+       * @param {Boolean} newTab
+       * @return {String}
+       * @private
+       */
+      _getIcon: function(newTab) {
+        return (newTab ? 'open-in-new' : 'open-in-browser');
       },
 
       /**

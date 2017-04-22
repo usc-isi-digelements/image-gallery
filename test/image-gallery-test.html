@@ -104,6 +104,11 @@ limitations under the License.
         expect(element._getBlurStyleClass(false)).to.equal('');
       });
 
+      test('_getIcon returns the correct value', function() {
+        expect(element._getIcon(true)).to.equal('open-in-new');
+        expect(element._getIcon(false)).to.equal('open-in-browser');
+      });
+
       test('_getImageTitle returns the correct value', function() {
         expect(element._getImageTitle(0)).to.equal('Click to View Full-Size Image #1');
         expect(element._getImageTitle(1)).to.equal('Click to View Full-Size Image #2');
@@ -151,6 +156,20 @@ limitations under the License.
         var image = element.$$('image-thumbnail-with-link');
         expect(image).to.exist;
         expect(image.id).to.equal('id1');
+        expect(image.icon).to.equal('open-in-browser');
+        expect(image.link).to.equal('link1');
+        expect(image.source).to.equal('source1');
+        expect(image.classList.contains('hovering')).to.be.false;
+        expect(image.classList.contains('selected')).to.be.false;
+      });
+
+      test('icon is open-in-new if newTab is true', function() {
+        element.newTab = true;
+
+        var image = element.$$('image-thumbnail-with-link');
+        expect(image).to.exist;
+        expect(image.id).to.equal('id1');
+        expect(image.icon).to.equal('open-in-new');
         expect(image.link).to.equal('link1');
         expect(image.source).to.equal('source1');
         expect(image.classList.contains('hovering')).to.be.false;
