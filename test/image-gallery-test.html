@@ -61,10 +61,11 @@ limitations under the License.
         }]);
       });
 
-      test('blur, imageLinkProperty, imageSourceProperty, and newTab are set to default values', function() {
-        expect(element.blur).to.equal(false);
+      test('default properties are set correctly', function() {
         expect(element.imageLinkProperty).to.equal('link');
         expect(element.imageSourceProperty).to.equal('source');
+        expect(element.smallImageStyleClass).to.equal('');
+        expect(element.largeImageStyleClass).to.equal('');
         expect(element.newTab).to.equal(false);
       });
 
@@ -74,7 +75,7 @@ limitations under the License.
         expect(element.$$('div').onTap).to.equal(element._stopClickPropagation(someEvent));
       });
 
-      test('_addStyleClass returns the correct value', function() {
+      test('_addStyleClass does return correctly', function() {
         expect(element._addStyleClass([], {}, 'id', 'styleClass1')).to.equal('');
         expect(element._addStyleClass([], {
           id: 'id1'
@@ -99,37 +100,29 @@ limitations under the License.
         }, 'id', 'styleClass2')).to.equal('styleClass2');
       });
 
-      test('_getBlurStyleClass returns the correct value', function() {
-        expect(element._getBlurStyleClass(true)).to.equal('small-blur');
-        expect(element._getBlurStyleClass(false)).to.equal('');
-      });
-
-      test('_getIcon returns the correct value', function() {
+      test('_getIcon does return correctly', function() {
         expect(element._getIcon(true)).to.equal('open-in-new');
         expect(element._getIcon(false)).to.equal('open-in-browser');
       });
 
-      test('_getImageTitle returns the correct value', function() {
+      test('_getImageTitle does return correctly', function() {
         expect(element._getImageTitle(0)).to.equal('Click to View Full-Size Image #1');
         expect(element._getImageTitle(1)).to.equal('Click to View Full-Size Image #2');
       });
 
-      test('_getProperty returns the correct id and source', function() {
+      test('_getProperty does return correctly', function() {
         expect(element._getProperty(element.images[0], element.imageLinkProperty)).to.be.equal('link1');
         expect(element._getProperty(element.images[0], element.imageSourceProperty)).to.be.equal('source1');
-      });
-
-      test('_getProperty returns defaultValue argument if item property does not exist', function() {
         expect(element._getProperty(element.images[0], 'invalidkey1', 'defaultValue')).to.be.equal('defaultValue');
         expect(element._getProperty(element.images[0], 'invalidkey2', 'anotherDefault')).to.be.equal('anotherDefault');
       });
 
-      test('_getTarget returns the correct value', function() {
+      test('_getTarget does return correctly', function() {
         expect(element._getTarget(true)).to.be.equal('_blank');
         expect(element._getTarget(false)).to.be.equal('_self');
       });
 
-      test('_createImageClickListener returns an object with the correct properties', function() {
+      test('_createImageClickListener does return an object with the correct properties', function() {
         var output = element._createImageClickListener();
         expect(output).to.exist;
         expect(output).to.be.an('Object');

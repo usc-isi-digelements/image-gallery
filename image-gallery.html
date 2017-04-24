@@ -80,9 +80,9 @@ Custom property          | Description                                  | Defaul
             icon="[[_getIcon(newTab)]]"
             link="[[_getProperty(image, imageLinkProperty)]]"
             source="[[_getProperty(image, imageSourceProperty)]]"
-            style-class="[[_getBlurStyleClass(blur)]]"
+            style-class="[[smallImageStyleClass]]"
             target="[[_getTarget(newTab)]]"
-            text="open"
+            text="Open"
             click-listener="[[_createImageClickListener()]]"
             click-title="[[_getImageTitle(index)]]"
             click-value="[[index]]">
@@ -97,7 +97,7 @@ Custom property          | Description                                  | Defaul
             on-mouseout="_hoverEnd"
             highlight
             source="[[_getProperty(image, imageSourceProperty)]]"
-            style-class="[[_getBlurStyleClass(blur)]]"
+            style-class="[[smallImageStyleClass]]"
             click-listener="[[_createImageClickListener()]]"
             click-title="[[_getImageTitle(index)]]"
             click-value="[[index]]">
@@ -118,7 +118,7 @@ Custom property          | Description                                  | Defaul
         /**
          * (Required)
          *
-         * The array of image objects.
+         * The list of image objects.
          *
          * @type {Array}
          * @default []
@@ -133,7 +133,7 @@ Custom property          | Description                                  | Defaul
         /**
          * (Optional)
          *
-         * The property of the image objects for their unique IDs.
+         * The unique ID property in the image objects.
          *
          * @type {String}
          * @default 'id'
@@ -146,7 +146,7 @@ Custom property          | Description                                  | Defaul
         /**
          * (Optional)
          *
-         * The property of the image objects for their link URL to open information within the application.
+         * The link URL property in the image objects to open information within the application.
          *
          * @type {String}
          * @default 'link'
@@ -159,7 +159,7 @@ Custom property          | Description                                  | Defaul
         /**
          * (Optional)
          *
-         * The property of the image objects for their source URL.
+         * The source URL property in the image objects.
          *
          * @type {String}
          * @default 'source'
@@ -172,14 +172,27 @@ Custom property          | Description                                  | Defaul
         /**
          * (Optional)
          *
-         * Whether to blur the images.
+         * The style class for all the images in the gallery.
          *
-         * @type {Boolean}
-         * @default false
+         * @type {String}
+         * @default ''
          */
-        blur: {
-          type: Boolean,
-          value: false
+        smallImageStyleClass: {
+          type: String,
+          value: ''
+        },
+
+        /**
+         * (Optional)
+         *
+         * The style class for any image in a popup.
+         *
+         * @type {String}
+         * @default ''
+         */
+        largeImageStyleClass: {
+          type: String,
+          value: ''
         },
 
         /**
@@ -238,17 +251,6 @@ Custom property          | Description                                  | Defaul
        */
       _addStyleClass: function(list, item, property, styleClass) {
         return item && typeof item[property] !== 'undefined' && list.indexOf(item[property]) >= 0 ? styleClass : '';
-      },
-
-      /**
-       * Returns the style class for blur.
-       *
-       * @param {Boolean} blur
-       * @return {String}
-       * @private
-       */
-      _getBlurStyleClass: function(blur) {
-        return (blur ? 'small-blur' : '');
       },
 
       /**
@@ -353,7 +355,7 @@ Custom property          | Description                                  | Defaul
           imageGalleryPopupElement.currentIndex = index;
           imageGalleryPopupElement.linkText = 'open image';
           imageGalleryPopupElement.linkTarget = self._getTarget(self.newTab);
-          imageGalleryPopupElement.styleClass = (self.blur ? 'large-blur' : '');
+          imageGalleryPopupElement.styleClass = self.largeImageStyleClass;
 
           body.insertBefore(imageGalleryPopupElement, firstChildOfBody);
         };
