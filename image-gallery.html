@@ -68,7 +68,7 @@ Custom property          | Description                                  | Defaul
       }
     </style>
 
-    <div class="layout horizontal center-justified flex wrap" on-tap="_stopClickPropagation">
+    <div class="layout horizontal flex wrap" on-tap="_stopClickPropagation">
       <template is="dom-repeat" items="[[images]]" as="image">
         <template is="dom-if" if="[[_getProperty(image, imageLinkProperty)]]">
           <image-thumbnail-with-link
