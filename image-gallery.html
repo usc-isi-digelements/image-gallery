@@ -52,19 +52,16 @@ Custom property          | Description                                  | Defaul
         height: 120px;
       }
 
-      image-thumbnail ::content paper-button {
-        margin: 5px;
-        padding: 5px;
+      image-thumbnail ::slotted(paper-button) {
+        margin: 10px;
       }
 
-      image-thumbnail.selected ::content .highlight,
-      image-thumbnail-with-link.selected ::content .highlight {
-        background-color: var(--image-selected-color);
+      .hovering {
+        --image-highlight-color: var(--image-hovering-color);
       }
 
-      image-thumbnail.hovering ::content .highlight,
-      image-thumbnail-with-link.hovering ::content .highlight {
-        background-color: var(--image-hovering-color);
+      .selected {
+        --image-highlight-color: var(--image-selected-color);
       }
     </style>
 

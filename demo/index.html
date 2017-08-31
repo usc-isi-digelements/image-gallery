@@ -18,23 +18,71 @@ limitations under the License.
 <head>
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, minimum-scale=1.0, initial-scale=1.0, user-scalable=yes">
-  <script src="../../webcomponentsjs/webcomponents-lite.min.js"></script>
+  <script src="../../webcomponentsjs/webcomponents-loader.js"></script>
   <link rel="import" href="../image-gallery.html">
 </head>
 
 <body unresolved>
-  <template is="dom-bind" id="demo">
-    <p>Images: [{link: http://nextcentury.com, source: NextCentury.png},{link: https://github.com/DigElements/image-gallery, source: dig.png}]</p>
-    <p>Image Link Property: link</p>
-    <p>Image Source Property: source</p>
-    <p>New Tab: true</p>
+  <dom-bind id="demo">
+    <style>
+      image-gallery {
+        --image-hovering-color: lightpink;
+        --image-selected-color: lightblue;
+      }
+    </style>
 
-    <image-gallery
-      images='[{"link":"http://nextcentury.com","source":"NextCentury.png"},{"link":"https://github.com/DigElements/image-gallery","source":"dig.png"}]'
-      image-link-property='link'
-      image-source-property='source'
-      new-tab>
-    </image-gallery>
-  </template>
+    <template is="dom-bind">
+      <p>Image ID Property: id</p>
+      <p>Image Link Property: link</p>
+      <p>Image Source Property: source</p>
+      <p>New Tab: true</p>
+      <p>--image-hovering-color: lightpink</p>
+      <p>--image-selected-color: lightblue</p>
+
+      <p>========== DEMO 1 ==========</p>
+      <p>Images: [{id: 1, source: NextCentury.png},{id: 2, source: dig.png}]</p>
+      <p>Hovering: [[hovering1]]</p>
+
+      <image-gallery
+        images='[{"id":"1","source":"NextCentury.png"},{"id":"2","source":"dig.png"}]'
+        new-tab
+        hovering="{{hovering1}}">
+      </image-gallery>
+
+      <p>========== DEMO 2 ==========</p>
+      <p>Images: [{id: 1, source: NextCentury.png},{id: 2, source: dig.png}]</p>
+      <p>Hovering: [[hovering2]]</p>
+      <p>Selected: 1</p>
+
+      <image-gallery
+        images='[{"id":"1","source":"NextCentury.png"},{"id":"2","source":"dig.png"}]'
+        new-tab
+        hovering="{{hovering2}}"
+        selected='["1"]'>
+      </image-gallery>
+
+      <p>========== DEMO 3 ==========</p>
+      <p>Images: [{id: 1, link: http://nextcentury.com, source: NextCentury.png},{id: 2, link: https://github.com/DigElements/image-gallery, source: dig.png}]</p>
+      <p>Hovering: [[hovering3]]</p>
+
+      <image-gallery
+        images='[{"id":"1","link":"http://nextcentury.com","source":"NextCentury.png"},{"id":"2","link":"https://github.com/DigElements/image-gallery","source":"dig.png"}]'
+        new-tab
+        hovering="{{hovering3}}">
+      </image-gallery>
+
+      <p>========== DEMO 3 ==========</p>
+      <p>Images: [{id: 1, link: http://nextcentury.com, source: NextCentury.png},{id: 2, link: https://github.com/DigElements/image-gallery, source: dig.png}]</p>
+      <p>Hovering: [[hovering4]]</p>
+      <p>Selected: 1</p>
+
+      <image-gallery
+        images='[{"id":"1","link":"http://nextcentury.com","source":"NextCentury.png"},{"id":"2","link":"https://github.com/DigElements/image-gallery","source":"dig.png"}]'
+        new-tab
+        hovering="{{hovering4}}"
+        selected='["1"]'>
+      </image-gallery>
+    </template>
+  </dom-bind>
 </body>
 </html>
