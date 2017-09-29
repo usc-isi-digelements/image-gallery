@@ -1,7 +1,7 @@
 {
   "name": "image-gallery",
   "description": "A Polymer Element showing a gallery of image thumbnails that each open an image-gallery-popup when clicked or tapped.",
-  "version": "2.0.1",
+  "version": "2.0.2",
   "authors": ["Next Century Corporation"],
   "license": "Apache-2.0",
   "keywords": [
@@ -16,9 +16,9 @@
   ],
   "dependencies": {
     "polymer": "Polymer/polymer#^2.0.2",
-    "image-gallery-popup": "DigElements/image-gallery-popup#^2.0.1",
-    "image-thumbnail": "DigElements/image-thumbnail#^2.0.1",
-    "image-thumbnail-with-link": "DigElements/image-thumbnail-with-link#^2.0.1",
+    "image-gallery-popup": "DigElements/image-gallery-popup#2.0.2",
+    "image-thumbnail": "DigElements/image-thumbnail#2.0.2",
+    "image-thumbnail-with-link": "DigElements/image-thumbnail-with-link#2.0.1",
     "iron-flex-layout": "PolymerElements/iron-flex-layout#^2.0.0"
   },
   "devDependencies": {

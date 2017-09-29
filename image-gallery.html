@@ -49,19 +49,18 @@ Custom property          | Description                                  | Defaul
       }
 
       image-thumbnail {
-        height: 120px;
-      }
-
-      image-thumbnail ::slotted(paper-button) {
-        margin: 10px;
-      }
-
-      .hovering {
-        --image-highlight-color: var(--image-hovering-color);
+        --image-button-style: {
+          margin: 5px;
+          padding: 5px;
+        };
       }
 
       .selected {
         --image-highlight-color: var(--image-selected-color);
+      }
+
+      .hovering {
+        --image-highlight-color: var(--image-hovering-color);
       }
     </style>
 
