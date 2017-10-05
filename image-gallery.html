@@ -16,25 +16,43 @@ limitations under the License.
 
 <link rel="import" href="../polymer/polymer.html">
 <link rel="import" href="../image-gallery-popup/image-gallery-popup.html">
-<link rel="import" href="../image-thumbnail-with-link/image-thumbnail-with-link.html">
+<link rel="import" href="../image-thumbnail/image-thumbnail.html">
 <link rel="import" href="../iron-flex-layout/iron-flex-layout-classes.html">
+<link rel="import" href="../paper-icon-button/paper-icon-button.html">
+<link rel="import" href="../paper-spinner/paper-spinner.html">
 
 <!--
 A Polymer Element showing a gallery of image thumbnails that each open an image-gallery-popup when clicked or tapped.
 
 ### Example
+
+```js
+var images = [{
+  id: 1,
+  link: 'https://github.com/DigElements',
+  name: 'DIG',
+  source: 'dig.png'
+}, {
+  id: 2,
+  link: 'https://nextcentury.com',
+  name: 'Next Century',
+  source: 'NextCentury.png'
+}];
+```
+
 ```html
-<image-gallery images="[[array]]"></image-gallery>
+<image-gallery images="[[images]]"></image-gallery>
 ```
 
 ### Styling
 
 `<image-gallery>` provides the following custom properties and mixins for styling:
 
-Custom property          | Description                                  | Default
--------------------------|----------------------------------------------|--------
-`--image-hovering-color` | The background color of the hovering images. | none
-`--image-selected-color` | The background color of the selected images. | none
+Custom property                  | Description                                  | Default
+---------------------------------|----------------------------------------------|--------
+`--image-gallery-hovering-color` | The background color of the hovering images. | none
+`--image-gallery-selected-color` | The background color of the selected images. | none
+`--image-gallery-label-style`    | The style of the label.                      | none
 
 @demo demo/index.html
 -->
@@ -48,57 +66,157 @@ Custom property          | Description                                  | Defaul
         display: block;
       }
 
+      .image-wrapper {
+        border-radius: 2px;
+        margin: 0 5px 5px 0;
+      }
+
+      .image-wrapper .options-wrapper {
+        visibility: hidden;
+      }
+
+      .image-wrapper:hover .options-wrapper,
+      .image-wrapper.selected .options-wrapper {
+        visibility: visible;
+      }
+
+      paper-spinner {
+        height: 15px;
+        width: 15px;
+        margin: 10px 0 5px;
+      }
+
+      .label {
+        font-size: 12px;
+        line-height: 15px;
+        margin: 10px 0 5px;
+        max-width: 100px;
+        overflow: hidden;
+        text-overflow: ellipsis;
+        white-space: nowrap;
+        word-wrap: break-word;
+        @apply --image-gallery-label-style;
+      }
+
+      paper-icon-button {
+        border-radius: 50%;
+        height: 20px;
+        width: 20px;
+        min-height: 20px;
+        min-width: 20px;
+        margin: 5px 10px 5px 0;
+        padding: 0;
+      }
+
+      paper-icon-button.blue:hover,
+      paper-icon-button.blue.selected {
+        color: blue;
+      }
+
+      paper-icon-button.green:hover,
+      paper-icon-button.green.selected {
+        color: green;
+      }
+
+      paper-icon-button.red:hover,
+      paper-icon-button.red.selected {
+        color: red;
+      }
+
       image-thumbnail {
-        --image-button-style: {
-          margin: 5px;
-          padding: 5px;
-        };
+        margin: 5px;
+        --image-thumbnail-highlight-color: transparent;
       }
 
-      .selected {
-        --image-highlight-color: var(--image-selected-color);
+      .image-wrapper.selected {
+        background-color: var(--image-gallery-selected-color, rgba(0,0,0,0.1));
       }
 
-      .hovering {
-        --image-highlight-color: var(--image-hovering-color);
+      .image-wrapper.hovering {
+        background-color: var(--image-gallery-hovering-color, rgba(0,0,0,0.1));
       }
     </style>
 
-    <div class="layout horizontal flex wrap" on-tap="_stopClickPropagation">
+    <div class="layout horizontal flex wrap">
       <template is="dom-repeat" items="[[images]]" as="image">
-        <template is="dom-if" if="[[_getProperty(image, imageLinkProperty)]]">
-          <image-thumbnail-with-link
-            id="[[_getProperty(image, imageIdProperty)]]"
-            class$="[[_addStyleClass(selected, image, imageIdProperty, 'selected')]] [[_addStyleClass(hovering, image, imageIdProperty, 'hovering')]]"
-            on-mouseover="_hoverStart"
-            on-mouseout="_hoverEnd"
-            highlight
-            icon="[[_getIcon(newTab)]]"
-            link="[[_getProperty(image, imageLinkProperty)]]"
-            source="[[_getProperty(image, imageSourceProperty)]]"
-            style-class="[[smallImageStyleClass]]"
-            target="[[_getTarget(newTab)]]"
-            text="Open"
-            click-listener="[[_createImageClickListener()]]"
-            click-title="[[_getImageTitle(index)]]"
-            click-value="[[index]]">
-          </image-thumbnail-with-link>
-        </template>
+        <div on-mouseover="_hoverBegin" on-mouseout="_hoverEnd"
+          class$="layout horizontal center image-wrapper [[_getStyleClass(selected, image, imageIdProperty, 'selected')]] [[_getStyleClass(hovering, image, imageIdProperty, 'hovering')]]">
 
-        <template is="dom-if" if="[[!_getProperty(image, imageLinkProperty)]]">
-          <image-thumbnail
-            id="[[_getProperty(image, imageIdProperty)]]"
-            class$="[[_addStyleClass(selected, image, imageIdProperty, 'selected')]] [[_addStyleClass(hovering, image, imageIdProperty, 'hovering')]]"
-            on-mouseover="_hoverStart"
-            on-mouseout="_hoverEnd"
-            highlight
-            source="[[_getProperty(image, imageSourceProperty)]]"
-            style-class="[[smallImageStyleClass]]"
-            click-listener="[[_createImageClickListener()]]"
-            click-title="[[_getImageTitle(index)]]"
-            click-value="[[index]]">
-          </image-thumbnail-with-link>
-        </template>
+          <div class="layout vertical center">
+            <template is="dom-if" if="[[showLabels]]">
+              <template is="dom-if" if="[[_isInList(processing, image, imageIdProperty)]]">
+                <paper-spinner active title="Processing..."></paper-spinner>
+              </template>
+
+              <template is="dom-if" if="[[!_isInList(processing, image, imageIdProperty)]]">
+                <div class="label" title$="[[_getImageLabel(image, imageNameProperty, index)]]">[[_getImageLabel(image, imageNameProperty, index)]]</div>
+              </template>
+            </template>
+
+            <image-thumbnail
+              id="[[_getProperty(image, imageIdProperty)]]"
+              class$="[[_getStyleClass(selected, image, imageIdProperty, 'selected')]] [[_getStyleClass(hovering, image, imageIdProperty, 'hovering')]]"
+              highlight
+              source="[[_getProperty(image, imageSourceProperty)]]"
+              style-class="[[smallImageStyleClass]]"
+              click-listener="[[_createImageClickListener()]]"
+              click-title="Click to View Full-Size [[_getImageLabel(image, imageNameProperty, index)]]"
+              click-value="[[index]]">
+            </image-thumbnail>
+          </div>
+
+          <div class="layout vertical center options-wrapper">
+            <template is="dom-if" if="[[showSelect]]">
+              <paper-icon-button
+                class$="green [[_getStyleClass(selected, image, imageIdProperty, 'selected')]]"
+                disabled="[[_isInList(processing, image, imageIdProperty)]]"
+                icon="[[_getSelectButtonIcon(selected, image, imageIdProperty)]]"
+                title$="[[_getSelectButtonText(selected, image, imageIdProperty, imageNameProperty, index)]]"
+                on-tap="_selectOrUnselect">
+              </paper-icon-button>
+
+              <template is="dom-if" if="[[showSelectPreceding]]">
+                <paper-icon-button
+                  class$="green [[_getStyleClass(selected, image, imageIdProperty, 'selected')]]"
+                  disabled="[[_isInList(processing, image, imageIdProperty)]]"
+                  icon="done-all"
+                  title$="[[_getSelectPrecedingButtonText(selected, image, imageIdProperty, imageNameProperty, index)]]"
+                  on-tap="_selectOrUnselectPreceding">
+                </paper-icon-button>
+              </template>
+            </template>
+
+            <template is="dom-if" if="[[showDelete]]">
+              <paper-icon-button
+                class="red"
+                disabled="[[_isInList(processing, image, imageIdProperty)]]"
+                icon="delete"
+                title="Click to Delete"
+                on-tap="_delete">
+              </paper-icon-button>
+
+              <template is="dom-if" if="[[showDeleteFollowing]]">
+                <paper-icon-button
+                  class="red"
+                  disabled="[[_isInList(processing, image, imageIdProperty)]]"
+                  icon="delete-sweep"
+                  title="Click to Delete This & All Following"
+                  on-tap="_deleteFollowing">
+                </paper-icon-button>
+              </template>
+            </template>
+
+            <template is="dom-if" if="[[_getProperty(image, imageLinkProperty)]]">
+              <paper-icon-button
+                class="blue"
+                disabled="[[_isInList(processing, image, imageIdProperty)]]"
+                icon="[[_getNewTabIcon(newTab)]]"
+                title$="Click to Open [[_getImageLabel(image, imageNameProperty, index)]]"
+                on-tap="_open">
+              </paper-icon-button>
+            </template>
+          </div>
+        </div>
       </template>
     </div>
   </template>
@@ -112,7 +230,7 @@ Custom property          | Description                                  | Defaul
 
       properties: {
         /**
-         * (Required)
+         * (Required|Output)
          *
          * The list of image objects.
          *
@@ -120,6 +238,7 @@ Custom property          | Description                                  | Defaul
          * @default []
          */
         images: {
+          notify: true,
           type: Array,
           value: function() {
             return [];
@@ -155,6 +274,19 @@ Custom property          | Description                                  | Defaul
         /**
          * (Optional)
          *
+         * The name property in the image objects to open information within the application.
+         *
+         * @type {String}
+         * @default 'name'
+         */
+        imageNameProperty: {
+          type: String,
+          value: 'name'
+        },
+
+        /**
+         * (Optional)
+         *
          * The source URL property in the image objects.
          *
          * @type {String}
@@ -163,32 +295,6 @@ Custom property          | Description                                  | Defaul
         imageSourceProperty: {
           type: String,
           value: 'source'
-        },
-
-        /**
-         * (Optional)
-         *
-         * The style class for all the images in the gallery.
-         *
-         * @type {String}
-         * @default ''
-         */
-        smallImageStyleClass: {
-          type: String,
-          value: ''
-        },
-
-        /**
-         * (Optional)
-         *
-         * The style class for any image in a popup.
-         *
-         * @type {String}
-         * @default ''
-         */
-        largeImageStyleClass: {
-          type: String,
-          value: ''
         },
 
         /**
@@ -210,6 +316,19 @@ Custom property          | Description                                  | Defaul
         /**
          * (Optional)
          *
+         * The style class for any image in a popup.
+         *
+         * @type {String}
+         * @default ''
+         */
+        largeImageStyleClass: {
+          type: String,
+          value: ''
+        },
+
+        /**
+         * (Optional)
+         *
          * Whether to open a link in a new tab.
          *
          * @type {Boolean}
@@ -223,106 +342,150 @@ Custom property          | Description                                  | Defaul
         /**
          * (Optional)
          *
+         * The list of image IDs that are loading, running, or otherwise processing.
+         *
+         * @type {Array}
+         * @default []
+         */
+        processing: {
+          type: Array,
+          value: function() {
+            return [];
+          }
+        },
+
+        /**
+         * (Optional|Output)
+         *
          * The list of selected image IDs.
          *
          * @type {Array}
          * @default []
          */
         selected: {
+          notify: true,
           type: Array,
           value: function() {
             return [];
           }
+        },
+
+        /**
+         * (Optional)
+         *
+         * The icon for the "select" button if the image is unselected.
+         *
+         * @type {String}
+         * @default 'done'
+         */
+        selectIcon: {
+          type: String,
+          value: 'done'
+        },
+
+        /**
+         * (Optional)
+         *
+         * Whether to show the "delete" buttons.
+         *
+         * @type {Boolean}
+         * @default false
+         */
+        showDelete: {
+          type: Boolean,
+          value: false
+        },
+
+        /**
+         * (Optional)
+         *
+         * Whether to show the "delete following" buttons.
+         *
+         * @type {Boolean}
+         * @default false
+         */
+        showDeleteFollowing: {
+          type: Boolean,
+          value: false
+        },
+
+        /**
+         * (Optional)
+         *
+         * Whether to show the labels for the images.
+         *
+         * @type {Boolean}
+         * @default false
+         */
+        showLabels: {
+          type: Boolean,
+          value: false
+        },
+
+        /**
+         * (Optional)
+         *
+         * Whether to show the "select" buttons.
+         *
+         * @type {Boolean}
+         * @default false
+         */
+        showSelect: {
+          type: Boolean,
+          value: false
+        },
+
+        /**
+         * (Optional)
+         *
+         * Whether to show the "select preceding" buttons.
+         *
+         * @type {Boolean}
+         * @default false
+         */
+        showSelectPreceding: {
+          type: Boolean,
+          value: false
+        },
+
+        /**
+         * (Optional)
+         *
+         * The style class for all the images in the gallery.
+         *
+         * @type {String}
+         * @default ''
+         */
+        smallImageStyleClass: {
+          type: String,
+          value: ''
+        },
+
+        /**
+         * (Optional)
+         *
+         * Whether clicking the "select" button for a selected image will unselect it.
+         *
+         * @type {Boolean}
+         * @default false
+         */
+        unselect: {
+          type: Boolean,
+          value: false
+        },
+
+        /**
+         * (Optional)
+         *
+         * The icon for the "select" button if the image is selected.
+         *
+         * @type {String}
+         * @default 'done'
+         */
+        unselectIcon: {
+          type: String,
+          value: 'done'
         }
-      },
-
-      /**
-       * Returns whether the value in the given item at the given property is in the given list.
-       *
-       * @param {Array} list
-       * @param {Object} item
-       * @param {String} property
-       * @return {Boolean}
-       * @private
-       */
-      _addStyleClass: function(list, item, property, styleClass) {
-        return item && typeof item[property] !== 'undefined' && list.indexOf(item[property]) >= 0 ? styleClass : '';
-      },
-
-      /**
-       * Returns the icon for links.
-       *
-       * @param {Boolean} newTab
-       * @return {String}
-       * @private
-       */
-      _getIcon: function(newTab) {
-        return (newTab ? 'open-in-new' : 'open-in-browser');
-      },
-
-      /**
-       * Returns the title for the image at the given index.
-       *
-       * @param {Number} index
-       * @return {String}
-       * @private
-       */
-      _getImageTitle: function(index) {
-        return 'Click to View Full-Size Image #' + (index + 1);
-      },
-
-      /**
-       * Returns the given property in the given item or the given default value if the property is empty.
-       *
-       * @param {Object} item
-       * @param {String} property
-       * @param defaultValue
-       * @return
-       * @private
-       */
-      _getProperty: function(item, property, defaultValue) {
-        return item[property] || defaultValue;
-      },
-
-      /**
-       * Returns the target for links.
-       *
-       * @param {Boolean} newTab
-       * @return {String}
-       * @private
-       */
-      _getTarget: function(newTab) {
-        return (newTab ? '_blank' : '_self');
-      },
-
-      /**
-       * Resets the hovering array.
-       *
-       * @event mouseout
-       * @private
-       */
-      _hoverEnd: function() {
-        this.set('hovering', []);
-      },
-
-      /**
-       * Sets the hovering array to the ID of the image in the given event model.
-       *
-       * @event mouseover
-       * @private
-       */
-      _hoverStart: function(event) {
-        this.set('hovering', [event.model.image[this.imageIdProperty]]);
-      },
-
-      /**
-       * Stops propagation of the given click event on the container element.
-       *
-       * @event tap
-       * @private
-       */
-      _stopClickPropagation: function(event) {
-        event.stopImmediatePropagation();
       },
 
       /**
@@ -359,6 +522,259 @@ Custom property          | Description                                  | Defaul
         return {
           onClick: createPopupElement
         };
+      },
+
+      /**
+       * Deletes the image in the given event model.
+       *
+       * @private
+       */
+      _delete: function(event) {
+        this._deleteList([event.model.image[this.imageIdProperty]]);
+      },
+
+      /**
+       * Deletes the image in the given event model and all following images.
+       *
+       * @private
+       */
+      _deleteFollowing: function(event) {
+        var imageIdProperty = this.imageIdProperty;
+        var idList = this.images.map(function(image) {
+          return image[imageIdProperty];
+        });
+        var imageIndex = idList.indexOf(event.model.image[imageIdProperty]);
+        this._deleteList(idList.slice(imageIndex));
+      },
+
+      /**
+       * Deletes the IDs in the given list.
+       *
+       * @param {Array} idList
+       * @private
+       */
+      _deleteList: function(idList) {
+        var imageIdProperty = this.imageIdProperty;
+
+        // Use the map function to create a new array.
+        this.set('selected', this.selected.map(function(id) {
+          return id;
+        }).filter(function(id) {
+          return idList.indexOf(id) < 0;
+        }));
+
+        // Use the map function to create a new array.
+        this.set('images', this.images.map(function(image) {
+          return image;
+        }).filter(function(image) {
+          return idList.indexOf(image[imageIdProperty]) < 0;
+        }));
+      },
+
+      /**
+       * Returns the image label using the given property in the given item or, if undefined, the given index.
+       *
+       * @param {Object} item
+       * @param {String} property
+       * @param {Number} index
+       * @return {String}
+       * @private
+       */
+      _getImageLabel: function(item, property, index) {
+        return item && item[property] ? item[property] : ('Image #' + (index + 1));
+      },
+
+      /**
+       * Returns the icon for links.
+       *
+       * @param {Boolean} newTab
+       * @return {String}
+       * @private
+       */
+      _getNewTabIcon: function(newTab) {
+        return (newTab ? 'open-in-new' : 'open-in-browser');
+      },
+
+      /**
+       * Returns the given property in the given item or the given default value if the property is empty.
+       *
+       * @param {Object} item
+       * @param {String} property
+       * @param defaultValue
+       * @return
+       * @private
+       */
+      _getProperty: function(item, property, defaultValue) {
+        return item[property] || defaultValue;
+      },
+
+      /**
+       * Returns the select button icon.
+       *
+       * @param {Array} list
+       * @param {Object} item
+       * @param {String} property
+       * @return {String}
+       * @private
+       */
+      _getSelectButtonIcon: function(list, item, property) {
+        return this._isInList(list, item, property) ? this.unselectIcon : this.selectIcon;
+      },
+
+      /**
+       * Returns the select button text.
+       *
+       * @param {Array} list
+       * @param {Object} item
+       * @param {String} idProperty
+       * @param {String} nameProperty
+       * @param {Number} index
+       * @return {String}
+       * @private
+       */
+      _getSelectButtonText: function(list, item, idProperty, nameProperty, index) {
+        if(this._isInList(list, item, idProperty)) {
+          return this._getImageLabel(item, nameProperty, index) + ' Selected' + (this.unselect ? ' (Click to Unselect)' : '');
+        }
+        return this._getImageLabel(item, nameProperty, index) + ' Unselected (Click to Select)';
+      },
+
+      /**
+       * Returns the select-preceding button text.
+       *
+       * @param {Array} list
+       * @param {Object} item
+       * @param {String} idProperty
+       * @param {String} nameProperty
+       * @param {Number} index
+       * @return {String}
+       * @private
+       */
+      _getSelectPrecedingButtonText: function(list, item, idProperty, nameProperty, index) {
+        if(this._isInList(list, item, idProperty)) {
+          return this._getImageLabel(item, nameProperty, index) + ' Selected' + (this.unselect ? ' (Click to Unselect This & All Preceding)' : '');
+        }
+        return this._getImageLabel(item, nameProperty, index) + ' Unselected (Click to Select This & All Preceding)';
+      },
+
+      /**
+       * Returns the given style class if the given property in the given item is in the given list.
+       *
+       * @param {Array} list
+       * @param {Object} item
+       * @param {String} property
+       * @param {String} styleClass
+       * @return {Boolean}
+       * @private
+       */
+      _getStyleClass: function(list, item, property, styleClass) {
+        return this._isInList(list, item, property) ? styleClass : '';
+      },
+
+      /**
+       * Returns the target for links.
+       *
+       * @param {Boolean} newTab
+       * @return {String}
+       * @private
+       */
+      _getTarget: function(newTab) {
+        return (newTab ? '_blank' : '_self');
+      },
+
+      /**
+       * Sets the hovering array to the ID of the image in the given event model.
+       *
+       * @private
+       */
+      _hoverBegin: function(event) {
+        this.set('hovering', [event.model.image[this.imageIdProperty]]);
+      },
+
+      /**
+       * Resets the hovering array.
+       *
+       * @private
+       */
+      _hoverEnd: function() {
+        this.set('hovering', []);
+      },
+
+      /**
+       * Returns whether the value in the given item at the given property is in the given list.
+       *
+       * @param {Array} list
+       * @param {Object} item
+       * @param {String} property
+       * @return {Boolean}
+       * @private
+       */
+      _isInList: function(list, item, property) {
+        return (item && typeof item[property] !== 'undefined' && (list.indexOf(item[property]) >= 0));
+      },
+
+      /**
+       * Opens the link for the given image.
+       *
+       * @private
+       */
+      _open: function(event) {
+        if(event.model.image[this.imageLinkProperty]) {
+          window.open(event.model.image[this.imageLinkProperty], this._getTarget(this.newTab));
+        }
+      },
+
+      /**
+       * Selects or unselects the ID of the image in the given event model.
+       *
+       * @private
+       */
+      _selectOrUnselect: function(event) {
+        this._selectOrUnselectList([event.model.image[this.imageIdProperty]]);
+      },
+
+      /**
+       * Selects or unselects the IDs in the given list.
+       *
+       * @param {Array} idList
+       * @private
+       */
+      _selectOrUnselectList: function(idList) {
+        // Use the map function to create a new array.
+        var selected = this.selected.map(function(id) {
+          return id;
+        });
+
+        // Unselect each ID in the list if `unselect` is true and the last ID in the list is selected; otherwise select each ID in the list.
+        var select = (this.unselect && (selected.indexOf(idList[idList.length - 1]) >= 0)) ? false : true;
+
+        idList.forEach(function(id) {
+          if(selected.indexOf(id) >= 0) {
+            if(!select) {
+              selected = selected.filter(function(selectedId) {
+                return selectedId !== id;
+              });
+            }
+          } else if(select) {
+            selected = selected.concat(id);
+          }
+        });
+
+        this.set('selected', selected);
+      },
+
+      /**
+       * Selects or unselects the ID of the image in the given event model and all preceding images.
+       *
+       * @private
+       */
+      _selectOrUnselectPreceding: function(event) {
+        var imageIdProperty = this.imageIdProperty;
+        var idList = this.images.map(function(image) {
+          return image[imageIdProperty];
+        });
+        var imageIndex = idList.indexOf(event.model.image[imageIdProperty]);
+        this._selectOrUnselectList(idList.slice(0, imageIndex + 1));
       }
     });
   })();

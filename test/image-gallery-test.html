@@ -39,90 +39,356 @@ limitations under the License.
         element.images = [{
           id: 'id1',
           link: 'link1',
+          name: 'name1',
           source: 'source1'
         }, {
           id: 'id2',
           link: 'link2',
+          name: 'name2',
           source: 'source2'
         }];
         flush(done);
       });
 
-      test('images is an array', function() {
-        expect(element.images).to.be.an('Array');
+      test('properties are set as expected', function() {
+        expect(element.hovering).to.deep.equal([]);
         expect(element.images).to.deep.equal([{
           id: 'id1',
           link: 'link1',
+          name: 'name1',
           source: 'source1'
         }, {
           id: 'id2',
           link: 'link2',
+          name: 'name2',
           source: 'source2'
         }]);
-      });
-
-      test('default properties are set correctly', function() {
+        expect(element.imageIdProperty).to.equal('id');
         expect(element.imageLinkProperty).to.equal('link');
+        expect(element.imageNameProperty).to.equal('name');
         expect(element.imageSourceProperty).to.equal('source');
-        expect(element.smallImageStyleClass).to.equal('');
         expect(element.largeImageStyleClass).to.equal('');
         expect(element.newTab).to.equal(false);
+        expect(element.processing).to.deep.equal([]);
+        expect(element.selected).to.deep.equal([]);
+        expect(element.selectIcon).to.equal('done');
+        expect(element.showDelete).to.equal(false);
+        expect(element.showDeleteFollowing).to.equal(false);
+        expect(element.showLabels).to.equal(false);
+        expect(element.showSelect).to.equal(false);
+        expect(element.showSelectPreceding).to.equal(false);
+        expect(element.unselect).to.equal(false);
+        expect(element.unselectIcon).to.equal('done');
+        expect(element.smallImageStyleClass).to.equal('');
       });
 
-      test('top level div has correct onTap function specified', function() {
-        var someEvent = document.createEvent('UIEvent');
-        expect(element.$$('div')).to.exist;
-        expect(element.$$('div').onTap).to.equal(element._stopClickPropagation(someEvent));
+      test('does have image-wrapper elements', function() {
+        var wrappers = Polymer.dom(element.root).querySelectorAll('.image-wrapper');
+        expect(wrappers.length).to.equal(2);
       });
 
-      test('_addStyleClass does return correctly', function() {
-        expect(element._addStyleClass([], {}, 'id', 'styleClass1')).to.equal('');
-        expect(element._addStyleClass([], {
+      test('does have options-wrapper elements', function() {
+        var wrappers = Polymer.dom(element.root).querySelectorAll('.options-wrapper');
+        expect(wrappers.length).to.equal(2);
+      });
+
+      test('does have image-thumbnail elements', function() {
+        var images = Polymer.dom(element.root).querySelectorAll('image-thumbnail');
+        expect(images.length).to.equal(2);
+
+        expect(images[0].classList.contains('hovering')).to.be.false;
+        expect(images[0].classList.contains('selected')).to.be.false;
+        expect(images[0].clickListener).to.be.an('Object');
+        expect(images[0].clickListener.onClick).to.be.a('Function');
+        expect(images[0].clickTitle).to.equal('Click to View Full-Size name1');
+        expect(images[0].clickValue).to.equal(0);
+        expect(images[0].highlight).to.be.true;
+        expect(images[0].id).to.equal('id1');
+        expect(images[0].source).to.equal('source1');
+
+        expect(images[1].classList.contains('hovering')).to.be.false;
+        expect(images[1].classList.contains('selected')).to.be.false;
+        expect(images[1].clickListener).to.be.an('Object');
+        expect(images[1].clickListener.onClick).to.be.a('Function');
+        expect(images[1].clickTitle).to.equal('Click to View Full-Size name2');
+        expect(images[1].clickValue).to.equal(1);
+        expect(images[1].highlight).to.be.true;
+        expect(images[1].id).to.equal('id2');
+        expect(images[1].source).to.equal('source2');
+      });
+
+      test('does not have label elements because showLabels is false', function() {
+        var labels = Polymer.dom(element.root).querySelectorAll('.label');
+        expect(labels.length).to.equal(0);
+      });
+
+      test('does have label elements if showLabels is true', function(done) {
+        element.showLabels = true;
+        flush(function() {
+          var labels = Polymer.dom(element.root).querySelectorAll('.label');
+          expect(labels.length).to.equal(2);
+          expect(labels[0].innerHTML).to.equal('name1');
+          expect(labels[1].innerHTML).to.equal('name2');
+          done();
+        });
+      });
+
+      test('does not have paper-spinner elements because showLabels is false', function(done) {
+        element.processing = ['id1', 'id2'];
+        flush(function() {
+          var spinners = Polymer.dom(element.root).querySelectorAll('paper-spinner');
+          expect(spinners.length).to.equal(0);
+          done();
+        });
+      });
+
+      test('does have paper-spinner elements if showLabels is true', function(done) {
+        element.processing = ['id1'];
+        element.showLabels = true;
+        flush(function() {
+          var spinners = Polymer.dom(element.root).querySelectorAll('paper-spinner');
+          expect(spinners.length).to.equal(1);
+          var labels = Polymer.dom(element.root).querySelectorAll('.label');
+          expect(labels.length).to.equal(1);
+          expect(labels[0].innerHTML).to.equal('name2');
+          done();
+        });
+      });
+
+      test('does have "open link" paper-icon-button elements because images have links', function() {
+        var buttons = Polymer.dom(element.root).querySelectorAll('paper-icon-button');
+        expect(buttons.length).to.equal(2);
+
+        expect(buttons[0].classList.contains('blue')).to.be.true;
+        expect(buttons[0].disabled).to.be.false;
+        expect(buttons[0].icon).to.equal('open-in-browser');
+        expect(buttons[0].title).to.equal('Click to Open name1');
+
+        expect(buttons[1].classList.contains('blue')).to.be.true;
+        expect(buttons[1].disabled).to.be.false;
+        expect(buttons[1].icon).to.equal('open-in-browser');
+        expect(buttons[1].title).to.equal('Click to Open name2');
+      });
+
+      test('does have more paper-icon-button elements if "show" properties are true', function(done) {
+        element.showDelete = true;
+        element.showDeleteFollowing = true;
+        element.showSelect = true;
+        element.showSelectPreceding = true;
+
+        flush(function() {
+          var buttons = Polymer.dom(element.root).querySelectorAll('paper-icon-button');
+          expect(buttons.length).to.equal(10);
+
+          expect(buttons[0].classList.contains('green')).to.be.true;
+          expect(buttons[0].classList.contains('selected')).to.be.false;
+          expect(buttons[0].disabled).to.be.false;
+          expect(buttons[0].icon).to.equal('done');
+          expect(buttons[0].title).to.equal('name1 Unselected (Click to Select)');
+
+          expect(buttons[1].classList.contains('green')).to.be.true;
+          expect(buttons[1].classList.contains('selected')).to.be.false;
+          expect(buttons[1].disabled).to.be.false;
+          expect(buttons[1].icon).to.equal('done-all');
+          expect(buttons[1].title).to.equal('name1 Unselected (Click to Select This & All Preceding)');
+
+          expect(buttons[2].classList.contains('red')).to.be.true;
+          expect(buttons[2].disabled).to.be.false;
+          expect(buttons[2].icon).to.equal('delete');
+          expect(buttons[2].title).to.equal('Click to Delete');
+
+          expect(buttons[3].classList.contains('red')).to.be.true;
+          expect(buttons[3].disabled).to.be.false;
+          expect(buttons[3].icon).to.equal('delete-sweep');
+          expect(buttons[3].title).to.equal('Click to Delete This & All Following');
+
+          expect(buttons[4].classList.contains('blue')).to.be.true;
+          expect(buttons[4].disabled).to.be.false;
+          expect(buttons[4].icon).to.equal('open-in-browser');
+          expect(buttons[4].title).to.equal('Click to Open name1');
+
+          expect(buttons[5].classList.contains('green')).to.be.true;
+          expect(buttons[5].classList.contains('selected')).to.be.false;
+          expect(buttons[5].disabled).to.be.false;
+          expect(buttons[5].icon).to.equal('done');
+          expect(buttons[5].title).to.equal('name2 Unselected (Click to Select)');
+
+          expect(buttons[6].classList.contains('green')).to.be.true;
+          expect(buttons[6].classList.contains('selected')).to.be.false;
+          expect(buttons[6].disabled).to.be.false;
+          expect(buttons[6].icon).to.equal('done-all');
+          expect(buttons[6].title).to.equal('name2 Unselected (Click to Select This & All Preceding)');
+
+          expect(buttons[7].classList.contains('red')).to.be.true;
+          expect(buttons[7].disabled).to.be.false;
+          expect(buttons[7].icon).to.equal('delete');
+          expect(buttons[7].title).to.equal('Click to Delete');
+
+          expect(buttons[8].classList.contains('red')).to.be.true;
+          expect(buttons[8].disabled).to.be.false;
+          expect(buttons[8].icon).to.equal('delete-sweep');
+          expect(buttons[8].title).to.equal('Click to Delete This & All Following');
+
+          expect(buttons[9].classList.contains('blue')).to.be.true;
+          expect(buttons[9].disabled).to.be.false;
+          expect(buttons[9].icon).to.equal('open-in-browser');
+          expect(buttons[9].title).to.equal('Click to Open name2');
+
+          done();
+        });
+      });
+
+      test('icon in "open link" buttons is open-in-new if newTab is true', function() {
+        element.newTab = true;
+
+        var buttons = Polymer.dom(element.root).querySelectorAll('paper-icon-button');
+        expect(buttons.length).to.equal(2);
+
+        expect(buttons[0].classList.contains('blue')).to.be.true;
+        expect(buttons[0].disabled).to.be.false;
+        expect(buttons[0].icon).to.equal('open-in-new');
+        expect(buttons[0].title).to.equal('Click to Open name1');
+
+        expect(buttons[1].classList.contains('blue')).to.be.true;
+        expect(buttons[1].disabled).to.be.false;
+        expect(buttons[1].icon).to.equal('open-in-new');
+        expect(buttons[1].title).to.equal('Click to Open name2');
+      });
+
+      test('buttons are disabled if processing', function(done) {
+        element.processing = ['id1'];
+        element.showDelete = true;
+        element.showDeleteFollowing = true;
+        element.showSelect = true;
+        element.showSelectPreceding = true;
+
+        flush(function() {
+          var buttons = Polymer.dom(element.root).querySelectorAll('paper-icon-button');
+          expect(buttons.length).to.equal(10);
+
+          expect(buttons[0].disabled).to.be.true;
+          expect(buttons[1].disabled).to.be.true;
+          expect(buttons[2].disabled).to.be.true;
+          expect(buttons[3].disabled).to.be.true;
+          expect(buttons[4].disabled).to.be.true;
+
+          expect(buttons[5].disabled).to.be.false;
+          expect(buttons[6].disabled).to.be.false;
+          expect(buttons[7].disabled).to.be.false;
+          expect(buttons[8].disabled).to.be.false;
+          expect(buttons[9].disabled).to.be.false;
+
+          done();
+        });
+      });
+
+      test('_getImageLabel does return as expected', function() {
+        expect(element._getImageLabel({}, 'id', 0)).to.equal('Image #1');
+        expect(element._getImageLabel({}, 'id', 1)).to.equal('Image #2');
+        expect(element._getImageLabel({
+          id: 'ABCD'
+        }, 'id', 0)).to.equal('ABCD');
+        expect(element._getImageLabel({
+          id: 'WXYZ'
+        }, 'id', 1)).to.equal('WXYZ');
+      });
+
+      test('_getNewTabIcon does return as expected', function() {
+        expect(element._getNewTabIcon(true)).to.equal('open-in-new');
+        expect(element._getNewTabIcon(false)).to.equal('open-in-browser');
+      });
+
+      test('_getProperty does return as expected', function() {
+        expect(element._getProperty(element.images[0], element.imageLinkProperty)).to.equal('link1');
+        expect(element._getProperty(element.images[0], element.imageSourceProperty)).to.equal('source1');
+        expect(element._getProperty(element.images[0], 'invalidkey1', 'defaultValue')).to.equal('defaultValue');
+        expect(element._getProperty(element.images[0], 'invalidkey2', 'anotherDefault')).to.equal('anotherDefault');
+      });
+
+      test('_getSelectButtonIcon does return as expected', function() {
+        element.selectIcon = 'plus';
+        element.unselectIcon = 'minus';
+
+        expect(element._getSelectButtonIcon([], {}, 'id')).to.equal('plus');
+        expect(element._getSelectButtonIcon([], {
+          id: 'id1'
+        }, 'id')).to.equal('plus');
+        expect(element._getSelectButtonIcon(['id1'], {
+          id: 'id1'
+        }, 'id')).to.equal('minus');
+        expect(element._getSelectButtonIcon(['id2'], {
+          id: 'id1'
+        }, 'id')).to.equal('plus');
+        expect(element._getSelectButtonIcon(['id1'], {
+          name: 'id1'
+        }, 'id')).to.equal('plus');
+        expect(element._getSelectButtonIcon(['id1'], {
+          id: 'id2'
+        }, 'id')).to.equal('plus');
+        expect(element._getSelectButtonIcon(['id1'], {
+          id: 'id1'
+        }, 'name')).to.equal('plus');
+        expect(element._getSelectButtonIcon(['id1', 'id2'], {
+          id: 'id2'
+        }, 'id')).to.equal('minus');
+      });
+
+      test('_getStyleClass does return as expected', function() {
+        expect(element._getStyleClass([], {}, 'id', 'styleClass1')).to.equal('');
+        expect(element._getStyleClass([], {
           id: 'id1'
         }, 'id', 'styleClass1')).to.equal('');
-        expect(element._addStyleClass(['id1'], {
+        expect(element._getStyleClass(['id1'], {
           id: 'id1'
         }, 'id', 'styleClass1')).to.equal('styleClass1');
-        expect(element._addStyleClass(['id2'], {
+        expect(element._getStyleClass(['id2'], {
           id: 'id1'
         }, 'id', 'styleClass1')).to.equal('');
-        expect(element._addStyleClass(['id1'], {
+        expect(element._getStyleClass(['id1'], {
           name: 'id1'
         }, 'id', 'styleClass1')).to.equal('');
-        expect(element._addStyleClass(['id1'], {
+        expect(element._getStyleClass(['id1'], {
           id: 'id2'
         }, 'id', 'styleClass1')).to.equal('');
-        expect(element._addStyleClass(['id1'], {
+        expect(element._getStyleClass(['id1'], {
           id: 'id1'
         }, 'name', 'styleClass1')).to.equal('');
-        expect(element._addStyleClass(['id1'], {
+        expect(element._getStyleClass(['id1', 'id2'], {
+          id: 'id2'
+        }, 'id', 'styleClass1')).to.equal('styleClass1');
+      });
+
+      test('_getTarget does return as expected', function() {
+        expect(element._getTarget(true)).to.equal('_blank');
+        expect(element._getTarget(false)).to.equal('_self');
+      });
+
+      test('_isInList does return as expected', function() {
+        expect(element._isInList([], {}, 'id')).to.be.false;
+        expect(element._isInList([], {
           id: 'id1'
-        }, 'id', 'styleClass2')).to.equal('styleClass2');
+        }, 'id')).to.be.false;
+        expect(element._isInList(['id1'], {
+          id: 'id1'
+        }, 'id')).to.be.true;
+        expect(element._isInList(['id2'], {
+          id: 'id1'
+        }, 'id')).to.be.false;
+        expect(element._isInList(['id1'], {
+          name: 'id1'
+        }, 'id')).to.be.false;
+        expect(element._isInList(['id1'], {
+          id: 'id2'
+        }, 'id')).to.be.false;
+        expect(element._isInList(['id1'], {
+          id: 'id1'
+        }, 'name')).to.be.false;
+        expect(element._isInList(['id1', 'id2'], {
+          id: 'id2'
+        }, 'id')).to.be.true;
       });
 
-      test('_getIcon does return correctly', function() {
-        expect(element._getIcon(true)).to.equal('open-in-new');
-        expect(element._getIcon(false)).to.equal('open-in-browser');
-      });
-
-      test('_getImageTitle does return correctly', function() {
-        expect(element._getImageTitle(0)).to.equal('Click to View Full-Size Image #1');
-        expect(element._getImageTitle(1)).to.equal('Click to View Full-Size Image #2');
-      });
-
-      test('_getProperty does return correctly', function() {
-        expect(element._getProperty(element.images[0], element.imageLinkProperty)).to.be.equal('link1');
-        expect(element._getProperty(element.images[0], element.imageSourceProperty)).to.be.equal('source1');
-        expect(element._getProperty(element.images[0], 'invalidkey1', 'defaultValue')).to.be.equal('defaultValue');
-        expect(element._getProperty(element.images[0], 'invalidkey2', 'anotherDefault')).to.be.equal('anotherDefault');
-      });
-
-      test('_getTarget does return correctly', function() {
-        expect(element._getTarget(true)).to.be.equal('_blank');
-        expect(element._getTarget(false)).to.be.equal('_self');
-      });
-
-      test('_createImageClickListener does return an object with the correct properties', function() {
+      test('_createImageClickListener does return an object with expected properties', function() {
         var output = element._createImageClickListener();
         expect(output).to.exist;
         expect(output).to.be.an('Object');
@@ -130,103 +396,114 @@ limitations under the License.
         expect(output.onClick).to.be.a('Function');
       });
 
-      test('onClick creates an image-gallery-popup element with the correct values', function() {
+      test('_createImageClickListener.onClick does create an image-gallery-popup element with expected values', function() {
         var output = element._createImageClickListener();
         output.onClick(1);
 
-        var imageGalleryPopupElement = document.querySelector('image-gallery-popup');
+        var imageGalleryPopupElement = Polymer.dom(document).querySelector('image-gallery-popup');
         expect(imageGalleryPopupElement).to.exist;
         expect(imageGalleryPopupElement.images).to.deep.equal(element.images);
         expect(imageGalleryPopupElement.currentIndex).to.equal(1);
         expect(imageGalleryPopupElement.currentImage).to.deep.equal({
           id: 'id2',
           link: 'link2',
+          name: 'name2',
           source: 'source2'
         });
       });
 
-      test('does have image-thumbnail-with-link elements', function() {
-        var image = element.$$('image-thumbnail-with-link');
-        expect(image).to.exist;
-        expect(image.id).to.equal('id1');
-        expect(image.icon).to.equal('open-in-browser');
-        expect(image.link).to.equal('link1');
-        expect(image.source).to.equal('source1');
-        expect(image.classList.contains('hovering')).to.be.false;
-        expect(image.classList.contains('selected')).to.be.false;
-      });
-
-      test('icon is open-in-new if newTab is true', function() {
-        element.newTab = true;
-
-        var image = element.$$('image-thumbnail-with-link');
-        expect(image).to.exist;
-        expect(image.id).to.equal('id1');
-        expect(image.icon).to.equal('open-in-new');
-        expect(image.link).to.equal('link1');
-        expect(image.source).to.equal('source1');
-        expect(image.classList.contains('hovering')).to.be.false;
-        expect(image.classList.contains('selected')).to.be.false;
-      });
-
-      test('adding image ID to hovering list does add hovering style class to image element', function(done) {
+      test('adding image ID to hovering list does add hovering style class to elements', function(done) {
         element.hovering = ['id1'];
 
         flush(function() {
-          expect(element.hovering).to.deep.equal(['id1']);
-          var image = element.$$('image-thumbnail-with-link');
-          expect(image).to.exist;
-          expect(image.classList.contains('hovering')).to.be.true;
-          expect(image.classList.contains('selected')).to.be.false;
+          var wrappers = Polymer.dom(element.root).querySelectorAll('.image-wrapper');
+          expect(wrappers.length).to.equal(2);
+          expect(wrappers[0].classList.contains('hovering')).to.be.true;
+          expect(wrappers[0].classList.contains('selected')).to.be.false;
+          expect(wrappers[1].classList.contains('hovering')).to.be.false;
+          expect(wrappers[1].classList.contains('selected')).to.be.false;
+
+          var images = Polymer.dom(element.root).querySelectorAll('image-thumbnail');
+          expect(images.length).to.equal(2);
+          expect(images[0].classList.contains('hovering')).to.be.true;
+          expect(images[0].classList.contains('selected')).to.be.false;
+          expect(images[1].classList.contains('hovering')).to.be.false;
+          expect(images[1].classList.contains('selected')).to.be.false;
+
           done();
         });
       });
 
-      test('adding image ID to selected list does add selected style class to image element', function(done) {
+      test('adding image ID to selected list does add selected style class to elements', function(done) {
         element.selected = ['id1'];
 
         flush(function() {
-          expect(element.selected).to.deep.equal(['id1']);
-          var image = element.$$('image-thumbnail-with-link');
-          expect(image).to.exist;
-          expect(image.classList.contains('hovering')).to.be.false;
-          expect(image.classList.contains('selected')).to.be.true;
+          var wrappers = Polymer.dom(element.root).querySelectorAll('.image-wrapper');
+          expect(wrappers.length).to.equal(2);
+          expect(wrappers[0].classList.contains('hovering')).to.be.false;
+          expect(wrappers[0].classList.contains('selected')).to.be.true;
+          expect(wrappers[1].classList.contains('hovering')).to.be.false;
+          expect(wrappers[1].classList.contains('selected')).to.be.false;
+
+          var images = Polymer.dom(element.root).querySelectorAll('image-thumbnail');
+          expect(images.length).to.equal(2);
+          expect(images[0].classList.contains('hovering')).to.be.false;
+          expect(images[0].classList.contains('selected')).to.be.true;
+          expect(images[1].classList.contains('hovering')).to.be.false;
+          expect(images[1].classList.contains('selected')).to.be.false;
+
           done();
         });
       });
 
-      test('adding image ID to both hovering and selected list does add both hovering and selected style class to image element', function(done) {
+      test('adding image ID to both hovering and selected list does add both hovering and selected style class to elements', function(done) {
         element.hovering = ['id1'];
         element.selected = ['id1'];
 
         flush(function() {
-          expect(element.hovering).to.deep.equal(['id1']);
-          expect(element.selected).to.deep.equal(['id1']);
-          var image = element.$$('image-thumbnail-with-link');
-          expect(image).to.exist;
-          expect(image.classList.contains('hovering')).to.be.true;
-          expect(image.classList.contains('selected')).to.be.true;
+          var wrappers = Polymer.dom(element.root).querySelectorAll('.image-wrapper');
+          expect(wrappers.length).to.equal(2);
+          expect(wrappers[0].classList.contains('hovering')).to.be.true;
+          expect(wrappers[0].classList.contains('selected')).to.be.true;
+          expect(wrappers[1].classList.contains('hovering')).to.be.false;
+          expect(wrappers[1].classList.contains('selected')).to.be.false;
+
+          var images = Polymer.dom(element.root).querySelectorAll('image-thumbnail');
+          expect(images.length).to.equal(2);
+          expect(images[0].classList.contains('hovering')).to.be.true;
+          expect(images[0].classList.contains('selected')).to.be.true;
+          expect(images[1].classList.contains('hovering')).to.be.false;
+          expect(images[1].classList.contains('selected')).to.be.false;
+
           done();
         });
       });
 
-      test('adding other image ID to hovering or selected list does not add hovering or selected style class to image element', function(done) {
+      test('adding other image ID to hovering or selected list does not add hovering or selected style class to elements', function(done) {
         element.hovering = ['otherId'];
         element.selected = ['otherId'];
 
         flush(function() {
-          expect(element.hovering).to.deep.equal(['otherId']);
-          expect(element.selected).to.deep.equal(['otherId']);
-          var image = element.$$('image-thumbnail-with-link');
-          expect(image).to.exist;
-          expect(image.classList.contains('hovering')).to.be.false;
-          expect(image.classList.contains('selected')).to.be.false;
+          var wrappers = Polymer.dom(element.root).querySelectorAll('.image-wrapper');
+          expect(wrappers.length).to.equal(2);
+          expect(wrappers[0].classList.contains('hovering')).to.be.false;
+          expect(wrappers[0].classList.contains('selected')).to.be.false;
+          expect(wrappers[1].classList.contains('hovering')).to.be.false;
+          expect(wrappers[1].classList.contains('selected')).to.be.false;
+
+          var images = Polymer.dom(element.root).querySelectorAll('image-thumbnail');
+          expect(images.length).to.equal(2);
+          expect(images[0].classList.contains('hovering')).to.be.false;
+          expect(images[0].classList.contains('selected')).to.be.false;
+          expect(images[1].classList.contains('hovering')).to.be.false;
+          expect(images[1].classList.contains('selected')).to.be.false;
+
           done();
         });
       });
 
-      test('_hoverStart does set the hovering array', function() {
-        element._hoverStart({
+      test('_hoverBegin does set the hovering array', function() {
+        element._hoverBegin({
           model: {
             image: {
               id: 'id1',
@@ -245,17 +522,265 @@ limitations under the License.
         expect(element.hovering).to.deep.equal([]);
       });
 
-      test('moving over an image does set the hovering array', function() {
-        var image = element.$$('image-thumbnail-with-link');
+      test('moving over an image-wrapper element does set the hovering array', function() {
+        var image = element.$$('.image-wrapper');
         image.dispatchEvent(new Event('mouseover'));
         expect(element.hovering).to.deep.equal(['id1']);
       });
 
-      test('moving out of an image does unset the hovering array', function() {
+      test('moving out of an image-wrapper element does unset the hovering array', function() {
         element.hovering = ['id1'];
-        var image = element.$$('image-thumbnail-with-link');
+        var image = element.$$('.image-wrapper');
         image.dispatchEvent(new Event('mouseout'));
         expect(element.hovering).to.deep.equal([]);
+      });
+
+      test('_delete does work as expected', function(done) {
+        element._delete({
+          model: {
+            image: {
+              id: 'id1'
+            }
+          }
+        });
+
+        flush(function() {
+          expect(element.images).to.deep.equal([{
+            id: 'id2',
+            link: 'link2',
+            name: 'name2',
+            source: 'source2'
+          }]);
+
+          var images = Polymer.dom(element.root).querySelectorAll('image-thumbnail');
+          expect(images.length).to.equal(1);
+
+          expect(images[0].classList.contains('hovering')).to.be.false;
+          expect(images[0].classList.contains('selected')).to.be.false;
+          expect(images[0].clickListener).to.be.an('Object');
+          expect(images[0].clickListener.onClick).to.be.a('Function');
+          expect(images[0].clickTitle).to.equal('Click to View Full-Size name2');
+          expect(images[0].clickValue).to.equal(0);
+          expect(images[0].highlight).to.be.true;
+          expect(images[0].id).to.equal('id2');
+          expect(images[0].source).to.equal('source2');
+
+          expect(Polymer.dom(element.root).querySelectorAll('.image-wrapper').length).to.equal(1);
+          expect(Polymer.dom(element.root).querySelectorAll('.options-wrapper').length).to.equal(1);
+          expect(Polymer.dom(element.root).querySelectorAll('paper-icon-button').length).to.equal(1);
+
+          done();
+        });
+      });
+
+      test('_deleteFollowing does work as expected on a single image', function(done) {
+        element._deleteFollowing({
+          model: {
+            image: {
+              id: 'id2'
+            }
+          }
+        });
+
+        flush(function() {
+          expect(element.images).to.deep.equal([{
+            id: 'id1',
+            link: 'link1',
+            name: 'name1',
+            source: 'source1'
+          }]);
+
+          var images = Polymer.dom(element.root).querySelectorAll('image-thumbnail');
+          expect(images.length).to.equal(1);
+
+          expect(images[0].classList.contains('hovering')).to.be.false;
+          expect(images[0].classList.contains('selected')).to.be.false;
+          expect(images[0].clickListener).to.be.an('Object');
+          expect(images[0].clickListener.onClick).to.be.a('Function');
+          expect(images[0].clickTitle).to.equal('Click to View Full-Size name1');
+          expect(images[0].clickValue).to.equal(0);
+          expect(images[0].highlight).to.be.true;
+          expect(images[0].id).to.equal('id1');
+          expect(images[0].source).to.equal('source1');
+
+          expect(Polymer.dom(element.root).querySelectorAll('.image-wrapper').length).to.equal(1);
+          expect(Polymer.dom(element.root).querySelectorAll('.options-wrapper').length).to.equal(1);
+          expect(Polymer.dom(element.root).querySelectorAll('paper-icon-button').length).to.equal(1);
+
+          done();
+        });
+      });
+
+      test('_deleteFollowing does work as expected on multiple images', function(done) {
+        element._deleteFollowing({
+          model: {
+            image: {
+              id: 'id1'
+            }
+          }
+        });
+
+        flush(function() {
+          expect(element.images).to.deep.equal([]);
+          expect(Polymer.dom(element.root).querySelectorAll('image-thumbnail').length).to.equal(0);
+          expect(Polymer.dom(element.root).querySelectorAll('.image-wrapper').length).to.equal(0);
+          expect(Polymer.dom(element.root).querySelectorAll('.options-wrapper').length).to.equal(0);
+          expect(Polymer.dom(element.root).querySelectorAll('paper-icon-button').length).to.equal(0);
+          done();
+        });
+      });
+
+      test('_selectOrUnselect does select', function() {
+        element._selectOrUnselect({
+          model: {
+            image: {
+              id: 'id2'
+            }
+          }
+        });
+
+        expect(element.selected).to.deep.equal(['id2']);
+      });
+
+      test('_selectOrUnselect does not unselect if unselect is false', function() {
+        element.selected = ['id2'];
+
+        element._selectOrUnselect({
+          model: {
+            image: {
+              id: 'id2'
+            }
+          }
+        });
+
+        expect(element.selected).to.deep.equal(['id2']);
+      });
+
+      test('_selectOrUnselect does unselect if unselect is true', function() {
+        element.selected = ['id2'];
+        element.unselect = true;
+
+        element._selectOrUnselect({
+          model: {
+            image: {
+              id: 'id2'
+            }
+          }
+        });
+
+        expect(element.selected).to.deep.equal([]);
+      });
+
+      test('_selectOrUnselectPreceding does select a single image', function() {
+        element._selectOrUnselectPreceding({
+          model: {
+            image: {
+              id: 'id1'
+            }
+          }
+        });
+
+        expect(element.selected).to.deep.equal(['id1']);
+      });
+
+      test('_selectOrUnselectPreceding does not unselect a single image if unselect is false', function() {
+        element.selected = ['id1'];
+
+        element._selectOrUnselectPreceding({
+          model: {
+            image: {
+              id: 'id1'
+            }
+          }
+        });
+
+        expect(element.selected).to.deep.equal(['id1']);
+      });
+
+      test('_selectOrUnselectPreceding does unselect a single image if unselect is true', function() {
+        element.selected = ['id1'];
+        element.unselect = true;
+
+        element._selectOrUnselectPreceding({
+          model: {
+            image: {
+              id: 'id1'
+            }
+          }
+        });
+
+        expect(element.selected).to.deep.equal([]);
+      });
+
+      test('_selectOrUnselectPreceding does select multiple images', function() {
+        element._selectOrUnselectPreceding({
+          model: {
+            image: {
+              id: 'id2'
+            }
+          }
+        });
+
+        expect(element.selected).to.deep.equal(['id1', 'id2']);
+      });
+
+      test('_selectOrUnselectPreceding does not unselect multiple images if unselect is false', function() {
+        element.selected = ['id1', 'id2'];
+
+        element._selectOrUnselectPreceding({
+          model: {
+            image: {
+              id: 'id2'
+            }
+          }
+        });
+
+        expect(element.selected).to.deep.equal(['id1', 'id2']);
+      });
+
+      test('_selectOrUnselectPreceding does unselect multiple images if unselect is true', function() {
+        element.selected = ['id1', 'id2'];
+        element.unselect = true;
+
+        element._selectOrUnselectPreceding({
+          model: {
+            image: {
+              id: 'id2'
+            }
+          }
+        });
+
+        expect(element.selected).to.deep.equal([]);
+      });
+
+      test('_selectOrUnselectPreceding does not select a preceding image if the starting image is selected', function() {
+        element.selected = ['id2'];
+        element.unselect = true;
+
+        element._selectOrUnselectPreceding({
+          model: {
+            image: {
+              id: 'id2'
+            }
+          }
+        });
+
+        expect(element.selected).to.deep.equal([]);
+      });
+
+      test('_selectOrUnselectPreceding does not unselect a preceding image if the starting image is unselected', function() {
+        element.selected = ['id1'];
+        element.unselect = true;
+
+        element._selectOrUnselectPreceding({
+          model: {
+            image: {
+              id: 'id2'
+            }
+          }
+        });
+
+        expect(element.selected).to.deep.equal(['id1', 'id2']);
       });
     });
 
@@ -274,63 +799,9 @@ limitations under the License.
         flush(done);
       });
 
-      test('images is an array', function() {
-        expect(element.images).to.be.an('Array');
-        expect(element.images).to.deep.equal([{
-          id: 'id1',
-          source: 'source1'
-        }, {
-          id: 'id2',
-          source: 'source2'
-        }]);
-      });
-
-      test('does have image-thumbnail elements', function() {
-        var image = element.$$('image-thumbnail');
-        expect(image).to.exist;
-        expect(image.id).to.equal('id1');
-        expect(image.source).to.equal('source1');
-        expect(image.classList.contains('hovering')).to.be.false;
-        expect(image.classList.contains('selected')).to.be.false;
-      });
-
-      test('adding image ID to hovering list does add hovering style class to image element', function(done) {
-        element.hovering = ['id1'];
-
-        flush(function() {
-          expect(element.hovering).to.deep.equal(['id1']);
-          var image = element.$$('image-thumbnail');
-          expect(image).to.exist;
-          expect(image.classList.contains('hovering')).to.be.true;
-          expect(image.classList.contains('selected')).to.be.false;
-          done();
-        });
-      });
-
-      test('adding image ID to selected list does add selected style class to image element', function(done) {
-        element.selected = ['id1'];
-
-        flush(function() {
-          expect(element.selected).to.deep.equal(['id1']);
-          var image = element.$$('image-thumbnail');
-          expect(image).to.exist;
-          expect(image.classList.contains('hovering')).to.be.false;
-          expect(image.classList.contains('selected')).to.be.true;
-          done();
-        });
-      });
-
-      test('moving over an image does set the hovering array', function() {
-        var image = element.$$('image-thumbnail');
-        image.dispatchEvent(new Event('mouseover'));
-        expect(element.hovering).to.deep.equal(['id1']);
-      });
-
-      test('moving out of an image does unset the hovering array', function() {
-        element.hovering = ['id1'];
-        var image = element.$$('image-thumbnail');
-        image.dispatchEvent(new Event('mouseout'));
-        expect(element.hovering).to.deep.equal([]);
+      test('does not have "open link" paper-icon-button elements if images do not have links', function() {
+        var buttons = Polymer.dom(element.root).querySelectorAll('paper-icon-button');
+        expect(buttons.length).to.equal(0);
       });
     });
   </script>

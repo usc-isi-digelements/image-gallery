@@ -26,61 +26,192 @@ limitations under the License.
   <dom-bind id="demo">
     <style>
       image-gallery {
-        --image-hovering-color: lightpink;
-        --image-selected-color: lightblue;
+        --image-gallery-hovering-color: lightpink;
+        --image-gallery-selected-color: lightblue;
       }
     </style>
+
+    <script>
+      (function(document) {
+        var demo = document.querySelector('dom-bind');
+
+        demo.images1 = [{
+          id: 1,
+          source: 'dig.png'
+        }, {
+          id: 2,
+          source: 'NextCentury.png'
+        }];
+
+        demo.images2 = [{
+          id: 1,
+          source: 'dig.png'
+        }, {
+          id: 2,
+          source: 'NextCentury.png'
+        }];
+
+        demo.images3 = [{
+          id: 1,
+          link: 'https://github.com/DigElements',
+          source: 'dig.png'
+        }, {
+          id: 2,
+          link: 'https://nextcentury.com',
+          source: 'NextCentury.png'
+        }];
+
+        demo.images4 = [{
+          id: 1,
+          link: 'https://github.com/DigElements',
+          source: 'dig.png'
+        }, {
+          id: 2,
+          link: 'https://nextcentury.com',
+          source: 'NextCentury.png'
+        }];
+
+        demo.images5 = [{
+          id: 1,
+          link: 'https://github.com/DigElements',
+          name: 'DIG',
+          source: 'dig.png'
+        }, {
+          id: 2,
+          link: 'https://nextcentury.com',
+          name: 'Next Century',
+          source: 'NextCentury.png'
+        }];
+
+        demo.images6 = [{
+          id: 1,
+          link: 'https://github.com/DigElements',
+          name: 'DIG',
+          source: 'dig.png'
+        }, {
+          id: 2,
+          link: 'https://nextcentury.com',
+          name: 'Next Century',
+          source: 'NextCentury.png'
+        }];
+
+        demo.selected2 = [1];
+        demo.selected3 = [1];
+        demo.selected4 = [1];
+        demo.selected5 = [1];
+        demo.processing6 = [1, 2];
+
+        demo.stringify = function(object) {
+          return JSON.stringify(object);
+        };
+      })(document);
+    </script>
 
     <template is="dom-bind">
       <p>Image ID Property: id</p>
       <p>Image Link Property: link</p>
+      <p>Image Name Property: name</p>
       <p>Image Source Property: source</p>
       <p>New Tab: true</p>
-      <p>--image-hovering-color: lightpink</p>
-      <p>--image-selected-color: lightblue</p>
+      <p>--image-gallery-hovering-color: lightpink</p>
+      <p>--image-gallery-selected-color: lightblue</p>
 
       <p>========== DEMO 1 ==========</p>
-      <p>Images: [{id: 1, source: NextCentury.png},{id: 2, source: dig.png}]</p>
+      <p>Images: [[stringify(images1)]]</p>
       <p>Hovering: [[hovering1]]</p>
 
       <image-gallery
-        images='[{"id":"1","source":"NextCentury.png"},{"id":"2","source":"dig.png"}]'
+        images="{{images1}}"
         new-tab
         hovering="{{hovering1}}">
       </image-gallery>
 
       <p>========== DEMO 2 ==========</p>
-      <p>Images: [{id: 1, source: NextCentury.png},{id: 2, source: dig.png}]</p>
+      <p>Images: [[stringify(images2)]]</p>
       <p>Hovering: [[hovering2]]</p>
-      <p>Selected: 1</p>
+      <p>Selected: [[selected2]]</p>
 
       <image-gallery
-        images='[{"id":"1","source":"NextCentury.png"},{"id":"2","source":"dig.png"}]'
+        images="{{images2}}"
         new-tab
         hovering="{{hovering2}}"
-        selected='["1"]'>
+        selected="{{selected2}}">
       </image-gallery>
 
       <p>========== DEMO 3 ==========</p>
-      <p>Images: [{id: 1, link: http://nextcentury.com, source: NextCentury.png},{id: 2, link: https://github.com/DigElements/image-gallery, source: dig.png}]</p>
+      <p>Images: [[stringify(images3)]]</p>
       <p>Hovering: [[hovering3]]</p>
+      <p>Selected: [[selected3]]</p>
 
       <image-gallery
-        images='[{"id":"1","link":"http://nextcentury.com","source":"NextCentury.png"},{"id":"2","link":"https://github.com/DigElements/image-gallery","source":"dig.png"}]'
+        images="{{images3}}"
         new-tab
-        hovering="{{hovering3}}">
+        hovering="{{hovering3}}"
+        selected="{{selected3}}">
       </image-gallery>
 
-      <p>========== DEMO 3 ==========</p>
-      <p>Images: [{id: 1, link: http://nextcentury.com, source: NextCentury.png},{id: 2, link: https://github.com/DigElements/image-gallery, source: dig.png}]</p>
+      <p>========== DEMO 4 ==========</p>
+      <p>Images: [[stringify(images4)]]</p>
       <p>Hovering: [[hovering4]]</p>
-      <p>Selected: 1</p>
+      <p>Selected: [[selected4]]</p>
+      <p>Show Delete: true<p>
+      <p>Show Select: true<p>
 
       <image-gallery
-        images='[{"id":"1","link":"http://nextcentury.com","source":"NextCentury.png"},{"id":"2","link":"https://github.com/DigElements/image-gallery","source":"dig.png"}]'
+        images="{{images4}}"
         new-tab
+        show-delete
+        show-select
         hovering="{{hovering4}}"
-        selected='["1"]'>
+        selected="{{selected4}}">
+      </image-gallery>
+
+      <p>========== DEMO 5 ==========</p>
+      <p>Images: [[stringify(images5)]]</p>
+      <p>Hovering: [[hovering5]]</p>
+      <p>Selected: [[selected5]]</p>
+      <p>Show Delete: true<p>
+      <p>Show Delete Following: true<p>
+      <p>Show Labels: true<p>
+      <p>Show Select: true<p>
+      <p>Show Select Preceding: true<p>
+      <p>Unselect: true<p>
+
+      <image-gallery
+        images="{{images5}}"
+        new-tab
+        show-delete
+        show-delete-following
+        show-labels
+        show-select
+        show-select-preceding
+        unselect
+        hovering="{{hovering5}}"
+        selected="{{selected5}}">
+      </image-gallery>
+
+      <p>========== DEMO 6 ==========</p>
+      <p>Images: [[stringify(images6)]]</p>
+      <p>Hovering: [[hovering6]]</p>
+      <p>Processing: [[processing6]]</p>
+      <p>Selected: [[selected6]]</p>
+      <p>Show Delete: true<p>
+      <p>Show Delete Following: true<p>
+      <p>Show Labels: true<p>
+      <p>Show Select: true<p>
+      <p>Show Select Preceding: true<p>
+
+      <image-gallery
+        images="{{images6}}"
+        processing="[[processing6]]"
+        new-tab
+        show-delete
+        show-delete-following
+        show-labels
+        show-select
+        show-select-preceding
+        hovering="{{hovering6}}"
+        selected="{{selected6}}">
       </image-gallery>
     </template>
   </dom-bind>

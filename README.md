@@ -3,18 +3,34 @@
 A Polymer Element showing a gallery of image thumbnails that each open an image-gallery-popup when clicked or tapped.
 
 ### Example
+
+```js
+var images = [{
+  id: 1,
+  link: 'https://github.com/DigElements',
+  name: 'DIG',
+  source: 'dig.png'
+}, {
+  id: 2,
+  link: 'https://nextcentury.com',
+  name: 'Next Century',
+  source: 'NextCentury.png'
+}];
+```
+
 ```html
-<image-gallery images="[[array]]"></image-gallery>
+<image-gallery images="[[images]]"></image-gallery>
 ```
 
 ### Styling
 
 `<image-gallery>` provides the following custom properties and mixins for styling:
 
-Custom property          | Description                                  | Default
--------------------------|----------------------------------------------|--------
-`--image-hovering-color` | The background color of the hovering images. | none
-`--image-selected-color` | The background color of the selected images. | none
+Custom property                  | Description                                  | Default
+---------------------------------|----------------------------------------------|--------
+`--image-gallery-hovering-color` | The background color of the hovering images. | none
+`--image-gallery-selected-color` | The background color of the selected images. | none
+`--image-gallery-label-style`    | The style of the label.                      | none
 
 ### Dependencies
 
