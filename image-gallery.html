@@ -20,6 +20,7 @@ limitations under the License.
 <link rel="import" href="../iron-flex-layout/iron-flex-layout-classes.html">
 <link rel="import" href="../paper-icon-button/paper-icon-button.html">
 <link rel="import" href="../paper-spinner/paper-spinner.html">
+<link rel="import" href="../paper-styles/color.html">
 
 <!--
 A Polymer Element showing a gallery of image thumbnails that each open an image-gallery-popup when clicked or tapped.
@@ -110,17 +111,17 @@ Custom property                  | Description                                  
 
       paper-icon-button.blue:hover,
       paper-icon-button.blue.selected {
-        color: blue;
+        color: var(--paper-blue-600, blue);
       }
 
       paper-icon-button.green:hover,
       paper-icon-button.green.selected {
-        color: green;
+        color: var(--paper-green-600, green);
       }
 
       paper-icon-button.red:hover,
       paper-icon-button.red.selected {
-        color: red;
+        color: var(--paper-red-600, red);
       }
 
       image-thumbnail {
@@ -138,7 +139,7 @@ Custom property                  | Description                                  
     </style>
 
     <div class="layout horizontal flex wrap">
-      <template is="dom-repeat" items="[[images]]" as="image" initial-count="10">
+      <template is="dom-repeat" items="[[images]]" as="image">
         <div on-mouseover="_hoverBegin" on-mouseout="_hoverEnd"
           class$="layout horizontal center image-wrapper [[_getStyleClass(selected, image, imageIdProperty, 'selected')]] [[_getStyleClass(hovering, image, imageIdProperty, 'hovering')]]">
 
