@@ -309,53 +309,68 @@ limitations under the License.
         element.selectIcon = 'plus';
         element.unselectIcon = 'minus';
 
-        expect(element._getSelectButtonIcon([], {}, 'id')).to.equal('plus');
-        expect(element._getSelectButtonIcon([], {
+        expect(element._getSelectButtonIcon({}, 'id', [])).to.equal('plus');
+        expect(element._getSelectButtonIcon({
           id: 'id1'
-        }, 'id')).to.equal('plus');
-        expect(element._getSelectButtonIcon(['id1'], {
+        }, 'id', [])).to.equal('plus');
+        expect(element._getSelectButtonIcon({
           id: 'id1'
-        }, 'id')).to.equal('minus');
-        expect(element._getSelectButtonIcon(['id2'], {
+        }, 'id', ['id1'])).to.equal('minus');
+        expect(element._getSelectButtonIcon({
           id: 'id1'
-        }, 'id')).to.equal('plus');
-        expect(element._getSelectButtonIcon(['id1'], {
+        }, 'id', ['id2'])).to.equal('plus');
+        expect(element._getSelectButtonIcon({
           name: 'id1'
-        }, 'id')).to.equal('plus');
-        expect(element._getSelectButtonIcon(['id1'], {
+        }, 'id', ['id1'])).to.equal('plus');
+        expect(element._getSelectButtonIcon({
           id: 'id2'
-        }, 'id')).to.equal('plus');
-        expect(element._getSelectButtonIcon(['id1'], {
+        }, 'id', ['id1'])).to.equal('plus');
+        expect(element._getSelectButtonIcon({
           id: 'id1'
-        }, 'name')).to.equal('plus');
-        expect(element._getSelectButtonIcon(['id1', 'id2'], {
+        }, 'name', ['id1'])).to.equal('plus');
+        expect(element._getSelectButtonIcon({
           id: 'id2'
-        }, 'id')).to.equal('minus');
+        }, 'id', ['id1', 'id2'])).to.equal('minus');
       });
 
-      test('_getStyleClass does return as expected', function() {
-        expect(element._getStyleClass([], {}, 'id', 'styleClass1')).to.equal('');
-        expect(element._getStyleClass([], {
+      test('_getSelectButtonIcon with list property does return as expected', function() {
+        element.selectIcon = 'plus';
+        element.unselectIcon = 'minus';
+
+        expect(element._getSelectButtonIcon({}, 'id', {}, 'list')).to.equal('plus');
+        expect(element._getSelectButtonIcon({
           id: 'id1'
-        }, 'id', 'styleClass1')).to.equal('');
-        expect(element._getStyleClass(['id1'], {
+        }, 'id', {}, 'list')).to.equal('plus');
+        expect(element._getSelectButtonIcon({
           id: 'id1'
-        }, 'id', 'styleClass1')).to.equal('styleClass1');
-        expect(element._getStyleClass(['id2'], {
+        }, 'id', {
+          list: ['id1']
+        }, 'list')).to.equal('minus');
+        expect(element._getSelectButtonIcon({
           id: 'id1'
-        }, 'id', 'styleClass1')).to.equal('');
-        expect(element._getStyleClass(['id1'], {
+        }, 'id', {
+          list: ['id2']
+        }, 'list')).to.equal('plus');
+        expect(element._getSelectButtonIcon({
           name: 'id1'
-        }, 'id', 'styleClass1')).to.equal('');
-        expect(element._getStyleClass(['id1'], {
+        }, 'id', {
+          list: ['id1']
+        }, 'list')).to.equal('plus');
+        expect(element._getSelectButtonIcon({
           id: 'id2'
-        }, 'id', 'styleClass1')).to.equal('');
-        expect(element._getStyleClass(['id1'], {
+        }, 'id', {
+          list: ['id1']
+        }, 'list')).to.equal('plus');
+        expect(element._getSelectButtonIcon({
           id: 'id1'
-        }, 'name', 'styleClass1')).to.equal('');
-        expect(element._getStyleClass(['id1', 'id2'], {
+        }, 'name', {
+          list: ['id1']
+        }, 'list')).to.equal('plus');
+        expect(element._getSelectButtonIcon({
           id: 'id2'
-        }, 'id', 'styleClass1')).to.equal('styleClass1');
+        }, 'id', {
+          list: ['id1', 'id2']
+        }, 'list')).to.equal('minus');
       });
 
       test('_getTarget does return as expected', function() {
@@ -363,29 +378,153 @@ limitations under the License.
         expect(element._getTarget(false)).to.equal('_self');
       });
 
-      test('_isInList does return as expected', function() {
-        expect(element._isInList([], {}, 'id')).to.be.false;
-        expect(element._isInList([], {
+      test('_isHovering does return as expected', function() {
+        expect(element._isHovering({}, 'id', [])).to.equal('');
+        expect(element._isHovering({
           id: 'id1'
-        }, 'id')).to.be.false;
-        expect(element._isInList(['id1'], {
+        }, 'id', [])).to.equal('');
+        expect(element._isHovering({
           id: 'id1'
-        }, 'id')).to.be.true;
-        expect(element._isInList(['id2'], {
+        }, 'id', ['id1'])).to.equal('hovering');
+        expect(element._isHovering({
           id: 'id1'
-        }, 'id')).to.be.false;
-        expect(element._isInList(['id1'], {
+        }, 'id', ['id2'])).to.equal('');
+        expect(element._isHovering({
           name: 'id1'
-        }, 'id')).to.be.false;
-        expect(element._isInList(['id1'], {
+        }, 'id', ['id1'])).to.equal('');
+        expect(element._isHovering({
           id: 'id2'
-        }, 'id')).to.be.false;
-        expect(element._isInList(['id1'], {
+        }, 'id', ['id1'])).to.equal('');
+        expect(element._isHovering({
           id: 'id1'
-        }, 'name')).to.be.false;
-        expect(element._isInList(['id1', 'id2'], {
+        }, 'name', ['id1'])).to.equal('');
+        expect(element._isHovering({
           id: 'id2'
-        }, 'id')).to.be.true;
+        }, 'id', ['id1', 'id2'])).to.equal('hovering');
+      });
+
+      test('_isInList does return as expected', function() {
+        expect(element._isInList({}, 'id', [])).to.be.false;
+        expect(element._isInList({
+          id: 'id1'
+        }, 'id', [])).to.be.false;
+        expect(element._isInList({
+          id: 'id1'
+        }, 'id', ['id1'])).to.be.true;
+        expect(element._isInList({
+          id: 'id1'
+        }, 'id', ['id2'])).to.be.false;
+        expect(element._isInList({
+          name: 'id1'
+        }, 'id', ['id1'])).to.be.false;
+        expect(element._isInList({
+          id: 'id2'
+        }, 'id', ['id1'])).to.be.false;
+        expect(element._isInList({
+          id: 'id1'
+        }, 'name', ['id1'])).to.be.false;
+        expect(element._isInList({
+          id: 'id2'
+        }, 'id', ['id1', 'id2'])).to.be.true;
+      });
+
+      test('_isInList with list property does return as expected', function() {
+        expect(element._isInList({}, 'id', {}, 'list')).to.be.false;
+        expect(element._isInList({
+          id: 'id1'
+        }, 'id', {}, 'list')).to.be.false;
+        expect(element._isInList({
+          id: 'id1'
+        }, 'id', {
+          list: ['id1']
+        }, 'list')).to.be.true;
+        expect(element._isInList({
+          id: 'id1'
+        }, 'id', {
+          list: ['id2']
+        }, 'list')).to.be.false;
+        expect(element._isInList({
+          name: 'id1'
+        }, 'id', {
+          list: ['id1']
+        }, 'list')).to.be.false;
+        expect(element._isInList({
+          id: 'id2'
+        }, 'id', {
+          list: ['id1']
+        }, 'list')).to.be.false;
+        expect(element._isInList({
+          id: 'id1'
+        }, 'name', {
+          list: ['id1']
+        }, 'list')).to.be.false;
+        expect(element._isInList({
+          id: 'id2'
+        }, 'id', {
+          list: ['id1', 'id2']
+        }, 'list')).to.be.true;
+      });
+
+      test('_isSelected does return as expected', function() {
+        expect(element._isSelected({}, 'id', [])).to.equal('');
+        expect(element._isSelected({
+          id: 'id1'
+        }, 'id', [])).to.equal('');
+        expect(element._isSelected({
+          id: 'id1'
+        }, 'id', ['id1'])).to.equal('selected');
+        expect(element._isSelected({
+          id: 'id1'
+        }, 'id', ['id2'])).to.equal('');
+        expect(element._isSelected({
+          name: 'id1'
+        }, 'id', ['id1'])).to.equal('');
+        expect(element._isSelected({
+          id: 'id2'
+        }, 'id', ['id1'])).to.equal('');
+        expect(element._isSelected({
+          id: 'id1'
+        }, 'name', ['id1'])).to.equal('');
+        expect(element._isSelected({
+          id: 'id2'
+        }, 'id', ['id1', 'id2'])).to.equal('selected');
+      });
+
+      test('_isSelected with list property does return as expected', function() {
+        expect(element._isSelected({}, 'id', {}, 'list')).to.equal('');
+        expect(element._isSelected({
+          id: 'id1'
+        }, 'id', {}, 'list')).to.equal('');
+        expect(element._isSelected({
+          id: 'id1'
+        }, 'id', {
+          list: ['id1']
+        }, 'list')).to.equal('selected');
+        expect(element._isSelected({
+          id: 'id1'
+        }, 'id', {
+          list: ['id2']
+        }, 'list')).to.equal('');
+        expect(element._isSelected({
+          name: 'id1'
+        }, 'id', {
+          list: ['id1']
+        }, 'list')).to.equal('');
+        expect(element._isSelected({
+          id: 'id2'
+        }, 'id', {
+          list: ['id1']
+        }, 'list')).to.equal('');
+        expect(element._isSelected({
+          id: 'id1'
+        }, 'name', {
+          list: ['id1']
+        }, 'list')).to.equal('');
+        expect(element._isSelected({
+          id: 'id2'
+        }, 'id', {
+          list: ['id1', 'id2']
+        }, 'list')).to.equal('selected');
       });
 
       test('_createImageClickListener does return an object with expected properties', function() {
@@ -422,14 +561,6 @@ limitations under the License.
           expect(wrappers[0].classList.contains('selected')).to.be.false;
           expect(wrappers[1].classList.contains('hovering')).to.be.false;
           expect(wrappers[1].classList.contains('selected')).to.be.false;
-
-          var images = Polymer.dom(element.root).querySelectorAll('image-thumbnail');
-          expect(images.length).to.equal(2);
-          expect(images[0].classList.contains('hovering')).to.be.true;
-          expect(images[0].classList.contains('selected')).to.be.false;
-          expect(images[1].classList.contains('hovering')).to.be.false;
-          expect(images[1].classList.contains('selected')).to.be.false;
-
           done();
         });
       });
@@ -444,14 +575,6 @@ limitations under the License.
           expect(wrappers[0].classList.contains('selected')).to.be.true;
           expect(wrappers[1].classList.contains('hovering')).to.be.false;
           expect(wrappers[1].classList.contains('selected')).to.be.false;
-
-          var images = Polymer.dom(element.root).querySelectorAll('image-thumbnail');
-          expect(images.length).to.equal(2);
-          expect(images[0].classList.contains('hovering')).to.be.false;
-          expect(images[0].classList.contains('selected')).to.be.true;
-          expect(images[1].classList.contains('hovering')).to.be.false;
-          expect(images[1].classList.contains('selected')).to.be.false;
-
           done();
         });
       });
@@ -467,14 +590,6 @@ limitations under the License.
           expect(wrappers[0].classList.contains('selected')).to.be.true;
           expect(wrappers[1].classList.contains('hovering')).to.be.false;
           expect(wrappers[1].classList.contains('selected')).to.be.false;
-
-          var images = Polymer.dom(element.root).querySelectorAll('image-thumbnail');
-          expect(images.length).to.equal(2);
-          expect(images[0].classList.contains('hovering')).to.be.true;
-          expect(images[0].classList.contains('selected')).to.be.true;
-          expect(images[1].classList.contains('hovering')).to.be.false;
-          expect(images[1].classList.contains('selected')).to.be.false;
-
           done();
         });
       });
@@ -490,14 +605,6 @@ limitations under the License.
           expect(wrappers[0].classList.contains('selected')).to.be.false;
           expect(wrappers[1].classList.contains('hovering')).to.be.false;
           expect(wrappers[1].classList.contains('selected')).to.be.false;
-
-          var images = Polymer.dom(element.root).querySelectorAll('image-thumbnail');
-          expect(images.length).to.equal(2);
-          expect(images[0].classList.contains('hovering')).to.be.false;
-          expect(images[0].classList.contains('selected')).to.be.false;
-          expect(images[1].classList.contains('hovering')).to.be.false;
-          expect(images[1].classList.contains('selected')).to.be.false;
-
           done();
         });
       });
@@ -536,6 +643,8 @@ limitations under the License.
       });
 
       test('_delete does work as expected', function(done) {
+        element.selected = ['id1', 'id2'];
+
         element._delete({
           model: {
             image: {
@@ -545,6 +654,53 @@ limitations under the License.
         });
 
         flush(function() {
+          expect(element.selected).to.deep.equal(['id2']);
+          expect(element.images).to.deep.equal([{
+            id: 'id2',
+            link: 'link2',
+            name: 'name2',
+            source: 'source2'
+          }]);
+
+          var images = Polymer.dom(element.root).querySelectorAll('image-thumbnail');
+          expect(images.length).to.equal(1);
+
+          expect(images[0].classList.contains('hovering')).to.be.false;
+          expect(images[0].classList.contains('selected')).to.be.false;
+          expect(images[0].clickListener).to.be.an('Object');
+          expect(images[0].clickListener.onClick).to.be.a('Function');
+          expect(images[0].clickTitle).to.equal('Click to View Full-Size name2');
+          expect(images[0].clickValue).to.equal(0);
+          expect(images[0].highlight).to.be.true;
+          expect(images[0].id).to.equal('id2');
+          expect(images[0].source).to.equal('source2');
+
+          expect(Polymer.dom(element.root).querySelectorAll('.image-wrapper').length).to.equal(1);
+          expect(Polymer.dom(element.root).querySelectorAll('.options-wrapper').length).to.equal(1);
+          expect(Polymer.dom(element.root).querySelectorAll('paper-icon-button').length).to.equal(1);
+
+          done();
+        });
+      });
+
+      test('_delete with selectedProperty does work as expected', function(done) {
+        element.selectedProperty = 'list';
+        element.selected = {
+          list: ['id1', 'id2']
+        };
+
+        element._delete({
+          model: {
+            image: {
+              id: 'id1'
+            }
+          }
+        });
+
+        flush(function() {
+          expect(element.selected).to.deep.equal({
+            list: ['id2']
+          });
           expect(element.images).to.deep.equal([{
             id: 'id2',
             link: 'link2',
@@ -640,6 +796,23 @@ limitations under the License.
         });
 
         expect(element.selected).to.deep.equal(['id2']);
+      });
+
+      test('_selectOrUnselect with selectedProperty does select', function() {
+        element.selectedProperty = 'list';
+        element.selected = {};
+
+        element._selectOrUnselect({
+          model: {
+            image: {
+              id: 'id2'
+            }
+          }
+        });
+
+        expect(element.selected).to.deep.equal({
+          list: ['id2']
+        });
       });
 
       test('_selectOrUnselect does not unselect if unselect is false', function() {
