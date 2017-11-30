@@ -20,7 +20,6 @@ limitations under the License.
 <link rel="import" href="../iron-flex-layout/iron-flex-layout-classes.html">
 <link rel="import" href="../paper-icon-button/paper-icon-button.html">
 <link rel="import" href="../paper-spinner/paper-spinner.html">
-<link rel="import" href="../paper-styles/color.html">
 
 <!--
 A Polymer Element showing a gallery of image thumbnails that each open an image-gallery-popup when clicked or tapped.
@@ -101,6 +100,7 @@ Custom property                  | Description                                  
 
       paper-icon-button {
         border-radius: 50%;
+        color: var(--disabled-text-color);
         height: 20px;
         width: 20px;
         min-height: 20px;
@@ -109,19 +109,9 @@ Custom property                  | Description                                  
         padding: 0;
       }
 
-      paper-icon-button.blue:hover,
-      paper-icon-button.blue.selected {
-        color: var(--paper-blue-600, blue);
-      }
-
-      paper-icon-button.green:hover,
-      paper-icon-button.green.selected {
-        color: var(--paper-green-600, green);
-      }
-
-      paper-icon-button.red:hover,
-      paper-icon-button.red.selected {
-        color: var(--paper-red-600, red);
+      paper-icon-button:hover,
+      paper-icon-button.selected {
+        color: var(--primary-text-color);
       }
 
       image-thumbnail {
@@ -168,7 +158,7 @@ Custom property                  | Description                                  
           <div class="layout vertical center options-wrapper">
             <template is="dom-if" if="[[showSelect]]">
               <paper-icon-button
-                class$="green [[_isSelected(image, imageIdProperty, selected, selectedProperty)]]"
+                class$="[[_isSelected(image, imageIdProperty, selected, selectedProperty)]]"
                 disabled="[[_isInList(image, imageIdProperty, processing)]]"
                 icon="[[_getSelectButtonIcon(image, imageIdProperty, selected, selectedProperty)]]"
                 title$="[[_getSelectButtonText(image, imageIdProperty, imageNameProperty, index, selected, selectedProperty)]]"
@@ -177,7 +167,7 @@ Custom property                  | Description                                  
 
               <template is="dom-if" if="[[showSelectPreceding]]">
                 <paper-icon-button
-                  class$="green [[_isSelected(image, imageIdProperty, selected, selectedProperty)]]"
+                  class$="[[_isSelected(image, imageIdProperty, selected, selectedProperty)]]"
                   disabled="[[_isInList(image, imageIdProperty, processing)]]"
                   icon="done-all"
                   title$="[[_getSelectPrecedingButtonText(image, imageIdProperty, imageNameProperty, index, selected, selectedProperty)]]"
@@ -188,7 +178,6 @@ Custom property                  | Description                                  
 
             <template is="dom-if" if="[[showDelete]]">
               <paper-icon-button
-                class="red"
                 disabled="[[_isInList(image, imageIdProperty, processing)]]"
                 icon="delete"
                 title="Click to Delete"
@@ -197,7 +186,6 @@ Custom property                  | Description                                  
 
               <template is="dom-if" if="[[showDeleteFollowing]]">
                 <paper-icon-button
-                  class="red"
                   disabled="[[_isInList(image, imageIdProperty, processing)]]"
                   icon="delete-sweep"
                   title="Click to Delete This & All Following"
@@ -208,7 +196,6 @@ Custom property                  | Description                                  
 
             <template is="dom-if" if="[[_getProperty(image, imageLinkProperty)]]">
               <paper-icon-button
-                class="blue"
                 disabled="[[_isInList(image, imageIdProperty, processing)]]"
                 icon="[[_getNewTabIcon(newTab)]]"
                 title$="Click to Open [[_getImageLabel(image, imageNameProperty, index)]]"
