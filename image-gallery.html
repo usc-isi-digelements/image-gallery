@@ -94,7 +94,6 @@ Custom property                  | Description                                  
         overflow: hidden;
         text-overflow: ellipsis;
         white-space: nowrap;
-        word-wrap: break-word;
         @apply --image-gallery-label-style;
       }
 
@@ -149,7 +148,7 @@ Custom property                  | Description                                  
               highlight
               source="[[_getProperty(image, imageSourceProperty)]]"
               style-class="[[smallImageStyleClass]]"
-              click-listener="[[_createImageClickListener()]]"
+              click-listener="[[_imageClickListener]]"
               click-title="Click to View Full-Size [[_getImageLabel(image, imageNameProperty, index)]]"
               click-value="[[index]]">
             </image-thumbnail>
@@ -161,7 +160,7 @@ Custom property                  | Description                                  
                 class$="[[_isSelected(image, imageIdProperty, selected, selectedProperty)]]"
                 disabled="[[_isInList(image, imageIdProperty, processing)]]"
                 icon="[[_getSelectButtonIcon(image, imageIdProperty, selected, selectedProperty)]]"
-                title$="[[_getSelectButtonText(image, imageIdProperty, imageNameProperty, index, selected, selectedProperty)]]"
+                title$="[[_getSelectButtonText(image, imageIdProperty, imageNameProperty, index, selected, selectedProperty, selectWord, unselectWord, unselect)]]"
                 on-tap="_selectOrUnselect">
               </paper-icon-button>
 
@@ -170,7 +169,7 @@ Custom property                  | Description                                  
                   class$="[[_isSelected(image, imageIdProperty, selected, selectedProperty)]]"
                   disabled="[[_isInList(image, imageIdProperty, processing)]]"
                   icon="done-all"
-                  title$="[[_getSelectPrecedingButtonText(image, imageIdProperty, imageNameProperty, index, selected, selectedProperty)]]"
+                  title$="[[_getSelectPrecedingButtonText(image, imageIdProperty, selected, selectedProperty, selectWord, unselectWord)]]"
                   on-tap="_selectOrUnselectPreceding">
                 </paper-icon-button>
               </template>
@@ -202,6 +201,13 @@ Custom property                  | Description                                  
                 on-tap="_open">
               </paper-icon-button>
             </template>
+
+            <paper-icon-button
+              disabled="[[_isInList(image, imageIdProperty, processing)]]"
+              icon="image:photo"
+              title$="Click to View Full-Size [[_getImageLabel(image, imageNameProperty, index)]]"
+              on-tap="_showFullSize">
+            </paper-icon-button>
           </div>
         </div>
       </template>
@@ -384,6 +390,19 @@ Custom property                  | Description                                  
         /**
          * (Optional)
          *
+         * The word for the "select" button text if the image is unselected.
+         *
+         * @type {String}
+         * @default 'Select'
+         */
+        selectWord: {
+          type: String,
+          value: 'Select'
+        },
+
+        /**
+         * (Optional)
+         *
          * Whether to show the "delete" buttons.
          *
          * @type {Boolean}
@@ -483,6 +502,30 @@ Custom property                  | Description                                  
         unselectIcon: {
           type: String,
           value: 'done'
+        },
+
+        /**
+         * (Optional)
+         *
+         * The word for the "select" button text if the image is selected.
+         *
+         * @type {String}
+         * @default 'Unselect'
+         */
+        unselectWord: {
+          type: String,
+          value: 'Unselect'
+        },
+
+        /**
+         * The click listener for the image.
+         *
+         * @type {Object}
+         * @private
+         */
+        _imageClickListener: {
+          computed: '_createImageClickListener()',
+          type: Object
         }
       },
 
@@ -525,6 +568,7 @@ Custom property                  | Description                                  
       /**
        * Deletes the image in the given event model.
        *
+       * @param {Event} event
        * @private
        */
       _delete: function(event) {
@@ -534,6 +578,7 @@ Custom property                  | Description                                  
       /**
        * Deletes the image in the given event model and all following images.
        *
+       * @param {Event} event
        * @private
        */
       _deleteFollowing: function(event) {
@@ -634,14 +679,17 @@ Custom property                  | Description                                  
        * @param {Number} index
        * @param {Array} list
        * @param {String} listProperty
+       * @param {String} selectWord
+       * @param {String} unselectWord
+       * @param {Boolean} unselect
        * @return {String}
        * @private
        */
-      _getSelectButtonText: function(item, idProperty, nameProperty, index, list, listProperty) {
+      _getSelectButtonText: function(item, idProperty, nameProperty, index, list, listProperty, selectWord, unselectWord, unselect) {
         if(this._isInList(item, idProperty, list, listProperty)) {
-          return this._getImageLabel(item, nameProperty, index) + ' Selected' + (this.unselect ? ' (Click to Unselect)' : '');
+          return (unselect ? 'Click to ' + unselectWord + ' ' : '') + this._getImageLabel(item, nameProperty, index);
         }
-        return this._getImageLabel(item, nameProperty, index) + ' Unselected (Click to Select)';
+        return 'Click to ' + selectWord + ' ' + this._getImageLabel(item, nameProperty, index);
       },
 
       /**
@@ -649,18 +697,18 @@ Custom property                  | Description                                  
        *
        * @param {Object} item
        * @param {String} idProperty
-       * @param {String} nameProperty
-       * @param {Number} index
        * @param {Array} list
        * @param {String} listProperty
+       * @param {String} selectWord
+       * @param {String} unselectWord
        * @return {String}
        * @private
        */
-      _getSelectPrecedingButtonText: function(item, idProperty, nameProperty, index, list, listProperty) {
+      _getSelectPrecedingButtonText: function(item, idProperty, list, listProperty, selectWord, unselectWord) {
         if(this._isInList(item, idProperty, list, listProperty)) {
-          return this._getImageLabel(item, nameProperty, index) + ' Selected' + (this.unselect ? ' (Click to Unselect This & All Preceding)' : '');
+          return 'Click to ' + unselectWord + ' This & All Preceding';
         }
-        return this._getImageLabel(item, nameProperty, index) + ' Unselected (Click to Select This & All Preceding)';
+        return 'Click to ' + selectWord + ' This & All Preceding';
       },
 
       /**
@@ -677,6 +725,7 @@ Custom property                  | Description                                  
       /**
        * Sets the hovering array to the ID of the image in the given event model.
        *
+       * @param {Event} event
        * @private
        */
       _hoverBegin: function(event) {
@@ -737,6 +786,7 @@ Custom property                  | Description                                  
       /**
        * Opens the link for the given image.
        *
+       * @param {Event} event
        * @private
        */
       _open: function(event) {
@@ -748,6 +798,7 @@ Custom property                  | Description                                  
       /**
        * Selects or unselects the ID of the image in the given event model.
        *
+       * @param {Event} event
        * @private
        */
       _selectOrUnselect: function(event) {
@@ -792,6 +843,7 @@ Custom property                  | Description                                  
       /**
        * Selects or unselects the ID of the image in the given event model and all preceding images.
        *
+       * @param {Event} event
        * @private
        */
       _selectOrUnselectPreceding: function(event) {
@@ -801,6 +853,16 @@ Custom property                  | Description                                  
         });
         var imageIndex = idList.indexOf(event.model.image[imageIdProperty]);
         this._selectOrUnselectList(idList.slice(0, imageIndex + 1));
+      },
+
+      /**
+       * Shows the full-size image.
+       *
+       * @param {Event} event
+       * @private
+       */
+      _showFullSize: function(event) {
+        this._imageClickListener.onClick(event.model.index);
       }
     });
   })();

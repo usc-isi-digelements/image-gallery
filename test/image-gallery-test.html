@@ -72,6 +72,7 @@ limitations under the License.
         expect(element.processing).to.deep.equal([]);
         expect(element.selected).to.deep.equal([]);
         expect(element.selectIcon).to.equal('done');
+        expect(element.selectWord).to.equal('Select');
         expect(element.showDelete).to.equal(false);
         expect(element.showDeleteFollowing).to.equal(false);
         expect(element.showLabels).to.equal(false);
@@ -79,7 +80,10 @@ limitations under the License.
         expect(element.showSelectPreceding).to.equal(false);
         expect(element.unselect).to.equal(false);
         expect(element.unselectIcon).to.equal('done');
+        expect(element.unselectWord).to.equal('Unselect');
         expect(element.smallImageStyleClass).to.equal('');
+        expect(element._imageClickListener).to.be.an('Object');
+        expect(element._imageClickListener.onClick).to.be.a('Function');
       });
 
       test('does have image-wrapper elements', function() {
@@ -157,15 +161,23 @@ limitations under the License.
 
       test('does have "open link" paper-icon-button elements because images have links', function() {
         var buttons = Polymer.dom(element.root).querySelectorAll('paper-icon-button');
-        expect(buttons.length).to.equal(2);
+        expect(buttons.length).to.equal(4);
 
         expect(buttons[0].disabled).to.be.false;
         expect(buttons[0].icon).to.equal('open-in-browser');
         expect(buttons[0].title).to.equal('Click to Open name1');
 
         expect(buttons[1].disabled).to.be.false;
-        expect(buttons[1].icon).to.equal('open-in-browser');
-        expect(buttons[1].title).to.equal('Click to Open name2');
+        expect(buttons[1].icon).to.equal('image:photo');
+        expect(buttons[1].title).to.equal('Click to View Full-Size name1');
+
+        expect(buttons[2].disabled).to.be.false;
+        expect(buttons[2].icon).to.equal('open-in-browser');
+        expect(buttons[2].title).to.equal('Click to Open name2');
+
+        expect(buttons[3].disabled).to.be.false;
+        expect(buttons[3].icon).to.equal('image:photo');
+        expect(buttons[3].title).to.equal('Click to View Full-Size name2');
       });
 
       test('does have more paper-icon-button elements if "show" properties are true', function(done) {
@@ -176,17 +188,17 @@ limitations under the License.
 
         flush(function() {
           var buttons = Polymer.dom(element.root).querySelectorAll('paper-icon-button');
-          expect(buttons.length).to.equal(10);
+          expect(buttons.length).to.equal(12);
 
           expect(buttons[0].classList.contains('selected')).to.be.false;
           expect(buttons[0].disabled).to.be.false;
           expect(buttons[0].icon).to.equal('done');
-          expect(buttons[0].title).to.equal('name1 Unselected (Click to Select)');
+          expect(buttons[0].title).to.equal('Click to Select name1');
 
           expect(buttons[1].classList.contains('selected')).to.be.false;
           expect(buttons[1].disabled).to.be.false;
           expect(buttons[1].icon).to.equal('done-all');
-          expect(buttons[1].title).to.equal('name1 Unselected (Click to Select This & All Preceding)');
+          expect(buttons[1].title).to.equal('Click to Select This & All Preceding');
 
           expect(buttons[2].disabled).to.be.false;
           expect(buttons[2].icon).to.equal('delete');
@@ -200,27 +212,35 @@ limitations under the License.
           expect(buttons[4].icon).to.equal('open-in-browser');
           expect(buttons[4].title).to.equal('Click to Open name1');
 
-          expect(buttons[5].classList.contains('selected')).to.be.false;
           expect(buttons[5].disabled).to.be.false;
-          expect(buttons[5].icon).to.equal('done');
-          expect(buttons[5].title).to.equal('name2 Unselected (Click to Select)');
+          expect(buttons[5].icon).to.equal('image:photo');
+          expect(buttons[5].title).to.equal('Click to View Full-Size name1');
 
           expect(buttons[6].classList.contains('selected')).to.be.false;
           expect(buttons[6].disabled).to.be.false;
-          expect(buttons[6].icon).to.equal('done-all');
-          expect(buttons[6].title).to.equal('name2 Unselected (Click to Select This & All Preceding)');
+          expect(buttons[6].icon).to.equal('done');
+          expect(buttons[6].title).to.equal('Click to Select name2');
 
+          expect(buttons[7].classList.contains('selected')).to.be.false;
           expect(buttons[7].disabled).to.be.false;
-          expect(buttons[7].icon).to.equal('delete');
-          expect(buttons[7].title).to.equal('Click to Delete');
+          expect(buttons[7].icon).to.equal('done-all');
+          expect(buttons[7].title).to.equal('Click to Select This & All Preceding');
 
           expect(buttons[8].disabled).to.be.false;
-          expect(buttons[8].icon).to.equal('delete-sweep');
-          expect(buttons[8].title).to.equal('Click to Delete This & All Following');
+          expect(buttons[8].icon).to.equal('delete');
+          expect(buttons[8].title).to.equal('Click to Delete');
 
           expect(buttons[9].disabled).to.be.false;
-          expect(buttons[9].icon).to.equal('open-in-browser');
-          expect(buttons[9].title).to.equal('Click to Open name2');
+          expect(buttons[9].icon).to.equal('delete-sweep');
+          expect(buttons[9].title).to.equal('Click to Delete This & All Following');
+
+          expect(buttons[10].disabled).to.be.false;
+          expect(buttons[10].icon).to.equal('open-in-browser');
+          expect(buttons[10].title).to.equal('Click to Open name2');
+
+          expect(buttons[11].disabled).to.be.false;
+          expect(buttons[11].icon).to.equal('image:photo');
+          expect(buttons[11].title).to.equal('Click to View Full-Size name2');
 
           done();
         });
@@ -230,15 +250,23 @@ limitations under the License.
         element.newTab = true;
 
         var buttons = Polymer.dom(element.root).querySelectorAll('paper-icon-button');
-        expect(buttons.length).to.equal(2);
+        expect(buttons.length).to.equal(4);
 
         expect(buttons[0].disabled).to.be.false;
         expect(buttons[0].icon).to.equal('open-in-new');
         expect(buttons[0].title).to.equal('Click to Open name1');
 
         expect(buttons[1].disabled).to.be.false;
-        expect(buttons[1].icon).to.equal('open-in-new');
-        expect(buttons[1].title).to.equal('Click to Open name2');
+        expect(buttons[1].icon).to.equal('image:photo');
+        expect(buttons[1].title).to.equal('Click to View Full-Size name1');
+
+        expect(buttons[2].disabled).to.be.false;
+        expect(buttons[2].icon).to.equal('open-in-new');
+        expect(buttons[2].title).to.equal('Click to Open name2');
+
+        expect(buttons[3].disabled).to.be.false;
+        expect(buttons[3].icon).to.equal('image:photo');
+        expect(buttons[3].title).to.equal('Click to View Full-Size name2');
       });
 
       test('buttons are disabled if processing', function(done) {
@@ -250,19 +278,21 @@ limitations under the License.
 
         flush(function() {
           var buttons = Polymer.dom(element.root).querySelectorAll('paper-icon-button');
-          expect(buttons.length).to.equal(10);
+          expect(buttons.length).to.equal(12);
 
           expect(buttons[0].disabled).to.be.true;
           expect(buttons[1].disabled).to.be.true;
           expect(buttons[2].disabled).to.be.true;
           expect(buttons[3].disabled).to.be.true;
           expect(buttons[4].disabled).to.be.true;
+          expect(buttons[5].disabled).to.be.true;
 
-          expect(buttons[5].disabled).to.be.false;
           expect(buttons[6].disabled).to.be.false;
           expect(buttons[7].disabled).to.be.false;
           expect(buttons[8].disabled).to.be.false;
           expect(buttons[9].disabled).to.be.false;
+          expect(buttons[10].disabled).to.be.false;
+          expect(buttons[11].disabled).to.be.false;
 
           done();
         });
@@ -663,7 +693,7 @@ limitations under the License.
 
           expect(Polymer.dom(element.root).querySelectorAll('.image-wrapper').length).to.equal(1);
           expect(Polymer.dom(element.root).querySelectorAll('.options-wrapper').length).to.equal(1);
-          expect(Polymer.dom(element.root).querySelectorAll('paper-icon-button').length).to.equal(1);
+          expect(Polymer.dom(element.root).querySelectorAll('paper-icon-button').length).to.equal(2);
 
           done();
         });
@@ -709,7 +739,7 @@ limitations under the License.
 
           expect(Polymer.dom(element.root).querySelectorAll('.image-wrapper').length).to.equal(1);
           expect(Polymer.dom(element.root).querySelectorAll('.options-wrapper').length).to.equal(1);
-          expect(Polymer.dom(element.root).querySelectorAll('paper-icon-button').length).to.equal(1);
+          expect(Polymer.dom(element.root).querySelectorAll('paper-icon-button').length).to.equal(2);
 
           done();
         });
@@ -747,7 +777,7 @@ limitations under the License.
 
           expect(Polymer.dom(element.root).querySelectorAll('.image-wrapper').length).to.equal(1);
           expect(Polymer.dom(element.root).querySelectorAll('.options-wrapper').length).to.equal(1);
-          expect(Polymer.dom(element.root).querySelectorAll('paper-icon-button').length).to.equal(1);
+          expect(Polymer.dom(element.root).querySelectorAll('paper-icon-button').length).to.equal(2);
 
           done();
         });
@@ -960,7 +990,15 @@ limitations under the License.
 
       test('does not have "open link" paper-icon-button elements if images do not have links', function() {
         var buttons = Polymer.dom(element.root).querySelectorAll('paper-icon-button');
-        expect(buttons.length).to.equal(0);
+        expect(buttons.length).to.equal(2);
+
+        expect(buttons[0].disabled).to.be.false;
+        expect(buttons[0].icon).to.equal('image:photo');
+        expect(buttons[0].title).to.equal('Click to View Full-Size Image #1');
+
+        expect(buttons[1].disabled).to.be.false;
+        expect(buttons[1].icon).to.equal('image:photo');
+        expect(buttons[1].title).to.equal('Click to View Full-Size Image #2');
       });
     });
   </script>
