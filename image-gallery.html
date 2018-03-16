@@ -20,6 +20,7 @@ limitations under the License.
 <link rel="import" href="../iron-flex-layout/iron-flex-layout-classes.html">
 <link rel="import" href="../paper-icon-button/paper-icon-button.html">
 <link rel="import" href="../paper-spinner/paper-spinner.html">
+<link rel="import" href="../paper-styles/color.html">
 
 <!--
 A Polymer Element showing a gallery of image thumbnails that each open an image-gallery-popup when clicked or tapped.
@@ -99,7 +100,7 @@ Custom property                  | Description                                  
 
       paper-icon-button {
         border-radius: 50%;
-        color: var(--disabled-text-color);
+        color: var(--paper-grey-300);
         height: 20px;
         width: 20px;
         min-height: 20px;
@@ -110,7 +111,7 @@ Custom property                  | Description                                  
 
       paper-icon-button:hover,
       paper-icon-button.selected {
-        color: var(--primary-text-color);
+        color: var(--paper-grey-900);
       }
 
       image-thumbnail {
@@ -119,11 +120,11 @@ Custom property                  | Description                                  
       }
 
       .image-wrapper.selected {
-        background-color: var(--image-gallery-selected-color, rgba(0,0,0,0.1));
+        background-color: var(--image-gallery-selected-color, rgba(0,0,0,0.05));
       }
 
       .image-wrapper.hovering {
-        background-color: var(--image-gallery-hovering-color, rgba(0,0,0,0.1));
+        background-color: var(--image-gallery-hovering-color, rgba(0,0,0,0.05));
       }
     </style>
 
