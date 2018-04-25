@@ -15,10 +15,10 @@ limitations under the License.
 -->
 
 <link rel="import" href="../polymer/polymer.html">
+<link rel="import" href="../icon-button/icon-button.html">
 <link rel="import" href="../image-gallery-popup/image-gallery-popup.html">
 <link rel="import" href="../image-thumbnail/image-thumbnail.html">
 <link rel="import" href="../iron-flex-layout/iron-flex-layout-classes.html">
-<link rel="import" href="../paper-icon-button/paper-icon-button.html">
 <link rel="import" href="../paper-spinner/paper-spinner.html">
 <link rel="import" href="../paper-styles/color.html">
 
@@ -51,8 +51,8 @@ var images = [{
 
 Custom property                  | Description                                  | Default
 ---------------------------------|----------------------------------------------|--------
-`--image-gallery-hovering-color` | The background color of the hovering images. | --paper-grey-300
-`--image-gallery-selected-color` | The background color of the selected images. | --paper-grey-300
+`--image-gallery-hovering-color` | The background color of the hovering images. | --paper-grey-100
+`--image-gallery-selected-color` | The background color of the selected images. | --paper-grey-100
 `--image-gallery-label-style`    | The style of the label.                      | none
 
 @demo demo/index.html
@@ -98,20 +98,8 @@ Custom property                  | Description                                  
         @apply --image-gallery-label-style;
       }
 
-      paper-icon-button {
-        border-radius: 50%;
-        color: var(--paper-grey-600);
-        height: 20px;
-        width: 20px;
-        min-height: 20px;
-        min-width: 20px;
+      icon-button {
         margin: 5px 10px 5px 0;
-        padding: 0;
-      }
-
-      paper-icon-button:hover,
-      paper-icon-button.selected {
-        color: var(--paper-grey-900);
       }
 
       image-thumbnail {
@@ -120,11 +108,11 @@ Custom property                  | Description                                  
       }
 
       .image-wrapper.selected {
-        background-color: var(--image-gallery-selected-color, var(--paper-grey-300));
+        background-color: var(--image-gallery-selected-color, var(--paper-grey-100));
       }
 
       .image-wrapper.hovering {
-        background-color: var(--image-gallery-hovering-color, var(--paper-grey-300));
+        background-color: var(--image-gallery-hovering-color, var(--paper-grey-100));
       }
     </style>
 
@@ -157,58 +145,58 @@ Custom property                  | Description                                  
 
           <div class="layout vertical center options-wrapper">
             <template is="dom-if" if="[[showSelect]]">
-              <paper-icon-button
-                class$="[[_isSelected(image, imageIdProperty, selected, selectedProperty)]]"
+              <icon-button
+                active="[[_isInList(image, imageIdProperty, selected, selectedProperty)]]"
                 disabled="[[_isInList(image, imageIdProperty, processing)]]"
                 icon="[[_getSelectButtonIcon(image, imageIdProperty, selected, selectedProperty)]]"
-                title$="[[_getSelectButtonText(image, imageIdProperty, imageNameProperty, index, selected, selectedProperty, selectWord, unselectWord, unselect)]]"
+                title-tooltip="[[_getSelectButtonText(image, imageIdProperty, imageNameProperty, index, selected, selectedProperty, selectWord, unselectWord, unselect)]]"
                 on-tap="_selectOrUnselect">
-              </paper-icon-button>
+              </icon-button>
 
               <template is="dom-if" if="[[showSelectPreceding]]">
-                <paper-icon-button
-                  class$="[[_isSelected(image, imageIdProperty, selected, selectedProperty)]]"
+                <icon-button
+                  active="[[_isInList(image, imageIdProperty, selected, selectedProperty)]]"
                   disabled="[[_isInList(image, imageIdProperty, processing)]]"
                   icon="done-all"
-                  title$="[[_getSelectPrecedingButtonText(image, imageIdProperty, selected, selectedProperty, selectWord, unselectWord)]]"
+                  title-tooltip="[[_getSelectPrecedingButtonText(image, imageIdProperty, selected, selectedProperty, selectWord, unselectWord)]]"
                   on-tap="_selectOrUnselectPreceding">
-                </paper-icon-button>
+                </icon-button>
               </template>
             </template>
 
             <template is="dom-if" if="[[showDelete]]">
-              <paper-icon-button
+              <icon-button
                 disabled="[[_isInList(image, imageIdProperty, processing)]]"
                 icon="delete"
-                title="Click to Delete"
+                title-tooltip="Click to Delete"
                 on-tap="_delete">
-              </paper-icon-button>
+              </icon-button>
 
               <template is="dom-if" if="[[showDeleteFollowing]]">
-                <paper-icon-button
+                <icon-button
                   disabled="[[_isInList(image, imageIdProperty, processing)]]"
                   icon="delete-sweep"
-                  title="Click to Delete This & All Following"
+                  title-tooltip="Click to Delete This & All Following"
                   on-tap="_deleteFollowing">
-                </paper-icon-button>
+                </icon-button>
               </template>
             </template>
 
             <template is="dom-if" if="[[_getProperty(image, imageLinkProperty)]]">
-              <paper-icon-button
+              <icon-button
                 disabled="[[_isInList(image, imageIdProperty, processing)]]"
                 icon="[[_getNewTabIcon(newTab)]]"
-                title$="Click to Open [[_getImageLabel(image, imageNameProperty, index)]]"
+                title-tooltip="Click to Open [[_getImageLabel(image, imageNameProperty, index)]]"
                 on-tap="_open">
-              </paper-icon-button>
+              </icon-button>
             </template>
 
-            <paper-icon-button
+            <icon-button
               disabled="[[_isInList(image, imageIdProperty, processing)]]"
               icon="image:photo"
-              title$="Click to View Full-Size [[_getImageLabel(image, imageNameProperty, index)]]"
+              title-tooltip="Click to View Full-Size [[_getImageLabel(image, imageNameProperty, index)]]"
               on-tap="_showFullSize">
-            </paper-icon-button>
+            </icon-button>
           </div>
         </div>
       </template>
