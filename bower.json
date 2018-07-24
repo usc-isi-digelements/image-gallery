@@ -1,24 +1,19 @@
 {
   "name": "image-gallery",
-  "description": "A Polymer Element showing a gallery of image thumbnails that each open an image-gallery-popup when clicked or tapped.",
-  "version": "2.2.0",
+  "description":
+    "A Polymer Element showing a gallery of image thumbnails that each open an image-gallery-popup when clicked or tapped.",
+  "version": "2.2.1",
   "authors": ["Next Century Corporation"],
   "license": "Apache-2.0",
-  "keywords": [
-    "web-component",
-    "polymer"
-  ],
+  "keywords": ["web-component", "polymer"],
   "main": "image-gallery.html",
   "homepage": "https://github.com/usc-isi-digelements/image-gallery/",
-  "ignore": [
-    "/.*",
-    "/test/"
-  ],
+  "ignore": ["/.*", "/test/"],
   "dependencies": {
     "polymer": "Polymer/polymer#^2.0.2",
-    "icon-button": "usc-isi-digelements/icon-button#2.0.1",
-    "image-gallery-popup": "usc-isi-digelements/image-gallery-popup#2.0.3",
-    "image-thumbnail": "usc-isi-digelements/image-thumbnail#2.0.3",
+    "icon-button": "usc-isi-digelements/icon-button#^2.0.2",
+    "image-gallery-popup": "usc-isi-digelements/image-gallery-popup#^2.0.3",
+    "image-thumbnail": "usc-isi-digelements/image-thumbnail#^2.0.3",
     "iron-flex-layout": "PolymerElements/iron-flex-layout#^2.0.0",
     "paper-spinner": "PolymerElements/paper-spinner#^2.0.0",
     "paper-styles": "PolymerElements/paper-styles#^2.0.0"
